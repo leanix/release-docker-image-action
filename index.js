@@ -32,7 +32,6 @@ const docker = require('dockerode')();
         currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
 
         taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
-        core.info(taggedCommit);
     }
 
     if (taggedCommit == currentCommit) {
