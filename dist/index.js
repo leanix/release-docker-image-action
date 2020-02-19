@@ -1670,9 +1670,11 @@ To use promises switch to importing 'simple-git/promise'.`);
 const core = __webpack_require__(310);
 const git = __webpack_require__(167)('.');
 
+core.info('hello world');
+
 git.tag(
     ["--merged", process.env.GITHUB_REF],
-    (tags) => core.debug(tags)
+    (tags) => core.info(tags)
 );
 
 
