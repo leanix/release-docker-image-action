@@ -24,7 +24,6 @@ const fs = require('fs');
     if (name == "") {
         name = process.env.GITHUB_REPOSITORY;
     }
-    let nameWithVersion = name + ":" + normalisedBranch + "-" + nextVersion;
 
     // Fetch tags and look for existing one matching the current versionTagPrefix
     await git.fetch(['--tags']);
@@ -54,20 +53,22 @@ const fs = require('fs');
     }
 
     // Configure docker
-    const dockerConfigFileDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
-    fs.mkdirSync(dockerConfigFileDirectory);
-    fs.writeFileSync(dockerConfigFileDirectory + "/config.json", JSON.stringify({
+    const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
+    fs.mkdirSync(dockerConfigDirectory);
+    fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({
         auths: {
             "https://index.docker.io/v1/": {
                 auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
             }
         }
     }));
-    core.exportVariable('DOCKER_CONFIG', dockerConfigFileDirectory);
+    core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
+    core.saveState('dockerConfigDirectory', dockerConfigDirectory);
 
     // Now build the docker image tagged with the correct version and push it
-    core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
+    const nameWithVersion = name + ":" + normalisedBranch + "-" + nextVersion;
     const options = {stdout: (data) => core.info(data.toString())};
+    core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
     await exec.exec('docker', ['build', '-t', nameWithVersion, path], options);
     await exec.exec('docker', ['push', nameWithVersion], options);
 
