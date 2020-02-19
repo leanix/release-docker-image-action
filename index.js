@@ -4,7 +4,7 @@ const docker = require('dockerode')();
 
 (async () => {
 
-    if (!process.env.GITHUB_REF) {
+    if (!process.env.GITHUB_REF || !process.env.GITHUB_REF.match(/^refs\/heads\//)) {
         core.error("No branch given via process.env.GITHUB_REF");
         process.exit(1);
     }
