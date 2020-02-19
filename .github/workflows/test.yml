@@ -15,3 +15,5 @@ jobs:
         secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}  
     - name: use-action
       uses: ./
+      with:
+        path: test/
