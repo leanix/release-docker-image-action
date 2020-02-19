@@ -19,7 +19,6 @@ const docker = require('dockerode')();
 
     const tagsString = await git.tag(
         [
-            '--merged', currentCommit, // Only list tags on the current branch...
             '-l', versionTagPrefix + '*', // ...that start with our version prefix...
             '--sort', '-v:refname' // ...and sort them in reverse
         ]
