@@ -12,7 +12,7 @@ const docker = require('dockerode')();
     const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
     const normalisedBranch = branch.replace(/[\W]+/, '-');
     const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
-    const currentCommit = await git.show(['--pretty=format:%H', '-s', process.env.GITHUB_REF]);
+    const currentCommit = process.env.GITHUB_SHA;
     core.info(currentCommit);
 
     const tagsString = await git.tag(
