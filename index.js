@@ -13,7 +13,6 @@ const docker = require('dockerode')();
     const normalisedBranch = branch.replace(/[\W]+/, '-');
     const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
     const currentCommit = process.env.GITHUB_SHA;
-    core.info("Current commit is: " + currentCommit);
 
     await git.fetch(['--tags']);
 
@@ -27,8 +26,6 @@ const docker = require('dockerode')();
     let currentVersion=0;
     let taggedCommit;
     let nextVersion;
-
-    core.info("tagsString is: " + JSON.stringify(tagsString));
 
     if (tagsString.length > 0) {
         const tags = tagsString.split('\n');
@@ -44,8 +41,8 @@ const docker = require('dockerode')();
     } else {
         nextVersion=currentVersion + 1;
         core.info("Next version on branch " + branch + " is " + nextVersion);
-        // await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
-        // await git.pushTags();
+        await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
+        await git.pushTags();
     }
 
     let path = core.getInput('path');
