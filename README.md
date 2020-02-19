@@ -11,6 +11,8 @@ with:
   path: docker/    # Optional, path to a folder containing a Dockerfile, by default . is used
 ```
 
+This action requires that you also use the "leanix/secrets-action@master".
+
 # Details
 
 The action will use *git tags* to manage a version that is used to tag the docker image. It will search for tags called "VERSION-<BRANCH>-<NUMBER>" on the current branch, where <BRANCH> is the name of the branch and <NUMBER> is a version. If it does not find one, it will start with version 1.
