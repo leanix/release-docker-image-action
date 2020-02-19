@@ -13,7 +13,7 @@ const docker = require('dockerode')();
     const normalisedBranch = branch.replace(/[\W]+/, '-');
     const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
     const currentCommit = process.env.GITHUB_SHA;
-    core.info(currentCommit);
+    core.info("Current commit is: " + currentCommit);
 
     const tagsString = await git.tag(
         [
@@ -27,7 +27,7 @@ const docker = require('dockerode')();
     let taggedCommit;
     let nextVersion;
 
-    core.info(tagsString);
+    core.info("tagsString is: " + tagsString);
 
     if (tagsString.length > 0) {
         const tags = tagsString.split('\n');
