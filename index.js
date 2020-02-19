@@ -15,11 +15,11 @@ const docker = require('dockerode')();
     const currentCommit = process.env.GITHUB_SHA;
     core.info("Current commit is: " + currentCommit);
 
-    await git.pull(['--prune', '--unshallow']);
+    await git.fetch(['--tags']);
 
     const tagsString = await git.tag(
         [
-            //'-l', versionTagPrefix + '*', // ...that start with our version prefix...
+            '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
             '--sort', '-v:refname' // ...and sort them in reverse
         ]
     );
