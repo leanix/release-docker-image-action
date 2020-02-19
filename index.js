@@ -19,7 +19,7 @@ const docker = require('dockerode')();
 
     const tagsString = await git.tag(
         [
-            '-l', versionTagPrefix + '*', // ...that start with our version prefix...
+            //'-l', versionTagPrefix + '*', // ...that start with our version prefix...
             '--sort', '-v:refname' // ...and sort them in reverse
         ]
     );
