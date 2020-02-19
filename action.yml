@@ -1,0 +1,13 @@
+name: 'LeanIX Release Docker Image'
+description: 'Build, tag and push a docker image.'
+inputs:
+  path:
+    description: 'Path to the Dockerfile'
+    required: true
+    default: '.'
+outputs:
+  tag:
+    description: 'The tag that was build and pushed'
+runs:
+  using: 'node12'
+  main: 'index.js'
