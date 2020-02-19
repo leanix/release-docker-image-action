@@ -1733,7 +1733,7 @@ const fs = __webpack_require__(747);
     }));
     core.exportVariable('DOCKER_CONFIG', dockerConfigFile);
 
-    await exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
+    await exec.exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
 
 })();
 

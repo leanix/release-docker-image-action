@@ -64,6 +64,6 @@ const fs = require('fs');
     }));
     core.exportVariable('DOCKER_CONFIG', dockerConfigFile);
 
-    await exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
+    await exec.exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
 
 })();
