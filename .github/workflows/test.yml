@@ -1,0 +1,19 @@
+name: test
+
+on: [push]
+
+jobs:
+  test:
+    name: test-${{ github.run_number }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: Get credentials
+      uses: leanix/secrets-action@master
+      with:
+        secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}  
+    - name: use-action
+      uses: ./
+      with:
+        path: test/
