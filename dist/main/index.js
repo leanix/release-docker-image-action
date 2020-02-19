@@ -1738,7 +1738,7 @@ const fs = __webpack_require__(747);
         // Now build the docker image tagged with the correct version and push it
         const versionTag = normalisedBranch + "-" + nextVersion
         const nameWithVersion = name + ":" + versionTag;
-        const options = {stdout: (data) => core.info(data.toString())};
+        const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
         core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
         await exec.exec('docker', ['build', '-t', nameWithVersion, path], options);
         await exec.exec('docker', ['push', nameWithVersion], options);
