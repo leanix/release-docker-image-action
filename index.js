@@ -1,6 +1,7 @@
 const core = require('@actions/core');
+const exec = require('@actions/exec');
 const git = require('simple-git/promise')();
-const docker = require('dockerode')();
+const fs = require('fs');
 
 (async () => {
 
@@ -52,23 +53,17 @@ const docker = require('dockerode')();
 
     core.info("Will build Dockerfile at " + path + " as " + name + ":" + normalisedBranch + "-" + nextVersion);
 
-    const dockerAuth = {
-        username: process.env.DOCKER_HUB_USERNAME,
-        password: process.env.DOCKER_HUB_PASSWORD,
-        serveraddress: 'https://index.docker.io/v1'
-    };
+    const dockerConfigFile = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
 
-    docker.pull('leanix/k8s-deploy', {'authconfig': dockerAuth}, function (err, stream) {
-        docker.modem.followProgress(stream, onFinished, onProgress);
-
-        function onFinished(err, output) {
-            if (err) {
-                core.error(err)
+    fs.writeFileSync(dockerConfigFile, JSON.stringify({
+        auths: {
+            "index.docker.io": {
+                auth: Buffer.from(proc.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
             }
-            core.info(JSON.stringify(output));
         }
-        function onProgress(event) {
-        }
-    });
+    }));
+    core.exportVariable('DOCKER_CONFIG', dockerConfigFile);
+
+    await exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
 
 })();
