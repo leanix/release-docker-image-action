@@ -53,16 +53,17 @@ const fs = require('fs');
 
     core.info("Will build Dockerfile at " + path + " as " + name + ":" + normalisedBranch + "-" + nextVersion);
 
-    const dockerConfigFile = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
+    const dockerConfigFileDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
 
-    fs.writeFileSync(dockerConfigFile, JSON.stringify({
+    fs.mkdirSync(dockerConfigFileDirectory);
+    fs.writeFileSync(dockerConfigFileDirectory + "/config.json", JSON.stringify({
         auths: {
             "index.docker.io": {
                 auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
             }
         }
     }));
-    core.exportVariable('DOCKER_CONFIG', dockerConfigFile);
+    core.exportVariable('DOCKER_CONFIG', dockerConfigFileDirectory);
 
     await exec.exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
 
