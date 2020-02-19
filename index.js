@@ -15,7 +15,7 @@ const docker = require('dockerode')();
     const currentCommit = process.env.GITHUB_SHA;
     core.info("Current commit is: " + currentCommit);
 
-    core.info(JSON.stringify(await git.fetch(['--depth=1', 'origin', '+refs/tags/*:refs/tags/*'])));
+    await git.fetch(['--prune', '--unshallow']);
 
     const tagsString = await git.tag(
         [
