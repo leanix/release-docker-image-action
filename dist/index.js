@@ -1674,18 +1674,29 @@ const fs = __webpack_require__(747);
 
 (async () => {
 
+    // Fail fast, we can only handle pushes to branches
     if (!process.env.GITHUB_REF || !process.env.GITHUB_REF.match(/^refs\/heads\//)) {
         core.error("No branch given via process.env.GITHUB_REF");
         process.exit(1);
     }
 
+    // Define some parameters
     const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
     const normalisedBranch = branch.replace(/[\W]+/, '-');
     const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
     const currentCommit = process.env.GITHUB_SHA;
+    let currentVersion=0;
+    let taggedCommit;
+    let nextVersion;
+    let path = core.getInput('path');
+    let name = core.getInput('name');
+    if (name == "") {
+        name = process.env.GITHUB_REPOSITORY;
+    }
+    let nameWithVersion = name + ":" + normalisedBranch + "-" + nextVersion;
 
+    // Fetch tags and look for existing one matching the current versionTagPrefix
     await git.fetch(['--tags']);
-
     const tagsString = await git.tag(
         [
             '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
@@ -1693,17 +1704,14 @@ const fs = __webpack_require__(747);
         ]
     );
 
-    let currentVersion=0;
-    let taggedCommit;
-    let nextVersion;
-
+    // If we found one, use it to update the current version and set the tagged commit
     if (tagsString.length > 0) {
         const tags = tagsString.split('\n');
         currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
-
         taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
     }
 
+    // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
     if (taggedCommit == currentCommit) {
         core.info("Current commit is already tagged with version " + currentVersion);
         nextVersion = currentVersion;
@@ -1714,16 +1722,8 @@ const fs = __webpack_require__(747);
         await git.pushTags();
     }
 
-    let path = core.getInput('path');
-    let name = core.getInput('name');
-    if (name == "") {
-        name = process.env.GITHUB_REPOSITORY;
-    }
-
-    core.info("Will build Dockerfile at " + path + " as " + name + ":" + normalisedBranch + "-" + nextVersion);
-
+    // Configure docker
     const dockerConfigFileDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
-
     fs.mkdirSync(dockerConfigFileDirectory);
     fs.writeFileSync(dockerConfigFileDirectory + "/config.json", JSON.stringify({
         auths: {
@@ -1733,7 +1733,12 @@ const fs = __webpack_require__(747);
         }
     }));
     core.exportVariable('DOCKER_CONFIG', dockerConfigFileDirectory);
-    await exec.exec('docker', ['pull', 'leanix/k8s-deploy'], {stdout: (data) => core.info(data.toString())});
+
+    // Now build the docker image tagged with the correct version and push it
+    core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
+    const options = {stdout: (data) => core.info(data.toString())};
+    await exec.exec('docker', ['build', '-t', nameWithVersion, path], options);
+    await exec.exec('docker', ['push', nameWithVersion], options);
 
 })();
 
