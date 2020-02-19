@@ -65,7 +65,7 @@ const docker = require('dockerode')();
             if (err) {
                 core.error(err)
             }
-            core.info(output);
+            core.info(JSON.stringify(output));
         }
         function onProgress(event) {
         }
