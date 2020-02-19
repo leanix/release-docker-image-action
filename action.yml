@@ -11,5 +11,5 @@ outputs:
     description: 'The tag that was build and pushed'
 runs:
   using: 'node12'
-  main: 'dist/index.js'
-  post: 'dist/cleanup.js'
+  main: 'dist/main/index.js'
+  post: 'dist/cleanup/cleanup.js'
