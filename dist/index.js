@@ -74,7 +74,7 @@ module.exports = {
 
    var debug = __webpack_require__(47)('simple-git');
    var deferred = __webpack_require__(837);
-   var exists = __webpack_require__(915);
+   var exists = __webpack_require__(412);
    var NOOP = function () {};
    var responses = __webpack_require__(9);
 
@@ -1668,14 +1668,50 @@ To use promises switch to importing 'simple-git/promise'.`);
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
 const core = __webpack_require__(310);
-const git = __webpack_require__(167)('.');
+const git = __webpack_require__(915)();
 
-core.info('hello world');
+(async () => {
 
-git.tag(
-    ["--merged", process.env.GITHUB_REF],
-    (tags) => core.info(tags)
-);
+    if (!process.env.GITHUB_REF) {
+        core.error("No branch given via process.env.GITHUB_REF");
+        process.exit(1);
+    }
+
+    const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
+    const normalisedBranch = branch.replace(/[\W]+/, '-').toUpperCase();
+    const versionTagPrefix = 'VERSION-' + normalisedBranch + '-';
+    const currentCommit = await git.show(['--pretty=format:%H', '-s', process.env.GITHUB_REF]);
+
+    const tagsString = await git.tag(
+        [
+            '--merged', process.env.GITHUB_REF, // Only list tags on the current branch...
+            '-l', versionTagPrefix + '*', // ...that start with our version prefix...
+            '--sort', '-v:refname' // ...and sort them in reverse
+        ]
+    );
+
+    let currentVersion=0;
+    let taggedCommit;
+    let nextVersion;
+
+    if (tagsString.length > 0) {
+        const tags = tagsString.split('\n');
+        currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
+
+        taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
+    }
+
+    if (taggedCommit == currentCommit) {
+        core.info("Current commit is already tagged with version " + currentVersion);
+        nextVersion = currentVersion;
+    } else {
+        nextVersion=currentVersion + 1;
+        core.info("Next version on branch " + branch + " is " + nextVersion);
+        await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
+        await git.pushTags();
+    }
+
+})();
 
 
 /***/ }),
@@ -2890,6 +2926,46 @@ CommitSummary.parse = function (commit) {
 
 /***/ }),
 
+/***/ 412:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+
+var fs = __webpack_require__(747);
+
+function exists (path, isFile, isDirectory) {
+   try {
+      var matches = false;
+      var stat = fs.statSync(path);
+
+      matches = matches || isFile && stat.isFile();
+      matches = matches || isDirectory && stat.isDirectory();
+
+      return matches;
+   }
+   catch (e) {
+      if (e.code === 'ENOENT') {
+         return false;
+      }
+
+      throw e;
+   }
+}
+
+module.exports = function (path, type) {
+   if (!type) {
+      return exists(path, true, true);
+   }
+
+   return exists(path, type & 1, type & 2);
+};
+
+module.exports.FILE = 1;
+
+module.exports.FOLDER = 2;
+
+
+/***/ }),
+
 /***/ 438:
 /***/ (function(module) {
 
@@ -3847,38 +3923,101 @@ ListLogSummary.parse = function (text, splitter, fields) {
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 
-var fs = __webpack_require__(747);
-
-function exists (path, isFile, isDirectory) {
-   try {
-      var matches = false;
-      var stat = fs.statSync(path);
-
-      matches = matches || isFile && stat.isFile();
-      matches = matches || isDirectory && stat.isDirectory();
-
-      return matches;
-   }
-   catch (e) {
-      if (e.code === 'ENOENT') {
-         return false;
-      }
-
-      throw e;
-   }
+if (typeof Promise === 'undefined') {
+   throw new ReferenceError("Promise wrappers must be enabled to use the promise API");
 }
 
-module.exports = function (path, type) {
-   if (!type) {
-      return exists(path, true, true);
+function isAsyncCall (fn) {
+   return /^[^)]+then\s*\)/.test(fn) || /\._run\(/.test(fn);
+}
+
+module.exports = function (baseDir) {
+
+   var Git = __webpack_require__(11);
+   var gitFactory = __webpack_require__(167);
+   var git;
+
+
+   var chain = Promise.resolve();
+
+   try {
+      git = gitFactory(baseDir);
+   }
+   catch (e) {
+      chain = Promise.reject(e);
    }
 
-   return exists(path, type & 1, type & 2);
+   return Object.keys(Git.prototype).reduce(function (promiseApi, fn) {
+      if (/^_|then/.test(fn)) {
+         return promiseApi;
+      }
+
+      if (isAsyncCall(Git.prototype[fn])) {
+         promiseApi[fn] = git ? asyncWrapper(fn, git) : function () {
+            return chain;
+         };
+      }
+
+      else {
+         promiseApi[fn] = git ? syncWrapper(fn, git, promiseApi) : function () {
+            return promiseApi;
+         };
+      }
+
+      return promiseApi;
+
+   }, {});
+
+   function asyncWrapper (fn, git) {
+      return function () {
+         var args = [].slice.call(arguments);
+
+         if (typeof args[args.length] === 'function') {
+            throw new TypeError(
+               "Promise interface requires that handlers are not supplied inline, " +
+               "trailing function not allowed in call to " + fn);
+         }
+
+         return chain.then(function () {
+            return new Promise(function (resolve, reject) {
+               args.push(function (err, result) {
+                  if (err) {
+                     return reject(toError(err));
+                  }
+
+                  resolve(result);
+               });
+
+               git[fn].apply(git, args);
+            });
+         });
+      };
+   }
+
+   function syncWrapper (fn, git, api) {
+      return function () {
+         git[fn].apply(git, arguments);
+
+         return api;
+      };
+   }
+
 };
 
-module.exports.FILE = 1;
+function toError (error) {
 
-module.exports.FOLDER = 2;
+   if (error instanceof Error) {
+      return error;
+   }
+
+   if (typeof error === 'string') {
+      return new Error(error);
+   }
+
+   return Object.create(new Error(error), {
+      git: { value: error },
+   });
+}
 
 
 /***/ }),
@@ -4005,7 +4144,7 @@ module.exports = {
 
    childProcess: function () { return __webpack_require__(129); },
 
-   exists: __webpack_require__(915)
+   exists: __webpack_require__(412)
 
 };
 
