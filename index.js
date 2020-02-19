@@ -15,6 +15,8 @@ const docker = require('dockerode')();
     const currentCommit = process.env.GITHUB_SHA;
     core.info("Current commit is: " + currentCommit);
 
+    await git.fetch(['--tags']);
+
     const tagsString = await git.tag(
         [
             '--merged', process.env.GITHUB_REF, // Only list tags on the current branch...
