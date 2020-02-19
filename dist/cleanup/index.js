@@ -1736,15 +1736,16 @@ const fs = __webpack_require__(747);
         core.saveState('dockerConfigDirectory', dockerConfigDirectory);
 
         // Now build the docker image tagged with the correct version and push it
-        const nameWithVersion = name + ":" + normalisedBranch + "-" + nextVersion;
+        const versionTag = normalisedBranch + "-" + nextVersion
+        const nameWithVersion = name + ":" + versionTag;
         const options = {stdout: (data) => core.info(data.toString())};
         core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
         await exec.exec('docker', ['build', '-t', nameWithVersion, path], options);
         await exec.exec('docker', ['push', nameWithVersion], options);
+        core.setOutput('tag', versionTag);
 
     } catch (e) {
-        core.error(e.message);
-        process.exit(1);
+        core.setFailed(e.message);
     }
 
 })();
