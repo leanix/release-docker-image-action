@@ -64,7 +64,6 @@ const fs = require('fs');
             }
         }));
         core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
-        core.saveState('dockerConfigDirectory', dockerConfigDirectory);
 
         // Now build the docker image tagged with the correct version and push it
         const versionTag = normalisedBranch + "-" + nextVersion
