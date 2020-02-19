@@ -1814,7 +1814,7 @@ const docker = __webpack_require__(894)();
     const currentCommit = process.env.GITHUB_SHA;
     core.info("Current commit is: " + currentCommit);
 
-    await git.fetch(['--depth=1', 'origin', '+refs/tags/*:refs/tags/*']);
+    core.info(await git.fetch(['--depth=1', 'origin', '+refs/tags/*:refs/tags/*']));
 
     const tagsString = await git.tag(
         [
