@@ -58,7 +58,7 @@ const fs = require('fs');
     fs.writeFileSync(dockerConfigFile, JSON.stringify({
         auths: {
             "index.docker.io": {
-                auth: Buffer.from(proc.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
+                auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
             }
         }
     }));
