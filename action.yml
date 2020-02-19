@@ -10,4 +10,4 @@ outputs:
     description: 'The tag that was build and pushed'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/index.js'
