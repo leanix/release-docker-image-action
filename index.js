@@ -13,6 +13,7 @@ const docker = require('dockerode')();
     const normalisedBranch = branch.replace(/[\W]+/, '-');
     const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
     const currentCommit = await git.show(['--pretty=format:%H', '-s', process.env.GITHUB_REF]);
+    core.info(currentCommit);
 
     const tagsString = await git.tag(
         [
@@ -26,11 +27,14 @@ const docker = require('dockerode')();
     let taggedCommit;
     let nextVersion;
 
+    core.info(tagsString);
+
     if (tagsString.length > 0) {
         const tags = tagsString.split('\n');
         currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
 
         taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
+        core.info(taggedCommit);
     }
 
     if (taggedCommit == currentCommit) {
