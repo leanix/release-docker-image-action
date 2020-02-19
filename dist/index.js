@@ -1811,8 +1811,8 @@ const docker = __webpack_require__(894)();
     const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
     const normalisedBranch = branch.replace(/[\W]+/, '-');
     const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
-    const currentCommit = await git.show(['--pretty=format:%H', '-s', process.env.GITHUB_REF]);
-    core.info(currentCommit);
+    const currentCommit = process.env.GITHUB_SHA;
+    core.info("Current commit is: " + currentCommit);
 
     const tagsString = await git.tag(
         [
@@ -1826,7 +1826,7 @@ const docker = __webpack_require__(894)();
     let taggedCommit;
     let nextVersion;
 
-    core.info(tagsString);
+    core.info("tagsString is: " + tagsString);
 
     if (tagsString.length > 0) {
         const tags = tagsString.split('\n');
