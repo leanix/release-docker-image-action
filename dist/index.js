@@ -1727,7 +1727,7 @@ const fs = __webpack_require__(747);
     fs.mkdirSync(dockerConfigFileDirectory);
     fs.writeFileSync(dockerConfigFileDirectory + "/config.json", JSON.stringify({
         auths: {
-            "index.docker.io": {
+            "https://index.docker.io/v1/": {
                 auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
             }
         }
