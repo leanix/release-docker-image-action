@@ -1845,7 +1845,7 @@ const docker = __webpack_require__(894)();
         nextVersion=currentVersion + 1;
         core.info("Next version on branch " + branch + " is " + nextVersion);
         await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
-        await git.pushTags();
+        // await git.pushTags();
     }
 
     let path = core.getInput('path');
