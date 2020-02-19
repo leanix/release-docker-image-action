@@ -15,7 +15,7 @@ const docker = require('dockerode')();
     const currentCommit = process.env.GITHUB_SHA;
     core.info("Current commit is: " + currentCommit);
 
-    core.info(await git.fetch(['--depth=1', 'origin', '+refs/tags/*:refs/tags/*']));
+    core.info(JSON.stringify(await git.fetch(['--depth=1', 'origin', '+refs/tags/*:refs/tags/*'])));
 
     const tagsString = await git.tag(
         [
@@ -29,7 +29,7 @@ const docker = require('dockerode')();
     let taggedCommit;
     let nextVersion;
 
-    core.info("tagsString is: " + tagsString);
+    core.info("tagsString is: " + JSON.stringify(tagsString));
 
     if (tagsString.length > 0) {
         const tags = tagsString.split('\n');
