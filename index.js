@@ -1,5 +1,6 @@
 const core = require('@actions/core');
 const git = require('simple-git/promise')();
+const docker = require('dockerode')();
 
 (async () => {
 
@@ -9,8 +10,8 @@ const git = require('simple-git/promise')();
     }
 
     const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
-    const normalisedBranch = branch.replace(/[\W]+/, '-').toUpperCase();
-    const versionTagPrefix = 'VERSION-' + normalisedBranch + '-';
+    const normalisedBranch = branch.replace(/[\W]+/, '-');
+    const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
     const currentCommit = await git.show(['--pretty=format:%H', '-s', process.env.GITHUB_REF]);
 
     const tagsString = await git.tag(
@@ -41,5 +42,13 @@ const git = require('simple-git/promise')();
         await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
         await git.pushTags();
     }
+
+    let path = core.getInput('path');
+    let name = core.getInput('name');
+    if (name == "") {
+        name = process.env.GITHUB_REPOSITORY;
+    }
+
+    core.info("Will build Dockerfile at " + path + " as " + name + ":" + normalisedBranch + "-" + nextVersion);
 
 })();

@@ -14,7 +14,8 @@
   },
   "homepage": "https://github.com/leanix/release-docker-image-action#readme",
   "dependencies": {
+    "@actions/core": "1.2.2",
     "simple-git": "1.131.0",
-    "@actions/core": "1.2.2"
+    "dockerode": "3.1.0"
   }
 }
