@@ -1864,7 +1864,7 @@ const docker = __webpack_require__(894)();
             if (err) {
                 core.error(err)
             }
-            core.info(output);
+            core.info(JSON.stringify(output));
         }
         function onProgress(event) {
         }
