@@ -1814,7 +1814,7 @@ const docker = __webpack_require__(894)();
     const currentCommit = process.env.GITHUB_SHA;
     core.info("Current commit is: " + currentCommit);
 
-    await git.fetch(['--tags']);
+    await git.fetch(['--depth=1', 'origin', '+refs/tags/*:refs/tags/*']);
 
     const tagsString = await git.tag(
         [
@@ -1844,7 +1844,7 @@ const docker = __webpack_require__(894)();
     } else {
         nextVersion=currentVersion + 1;
         core.info("Next version on branch " + branch + " is " + nextVersion);
-        await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
+        // await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
         // await git.pushTags();
     }
 
