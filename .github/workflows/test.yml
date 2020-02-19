@@ -9,5 +9,9 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
+    - name: Get credentials
+      uses: leanix/secrets-action@master
+      with:
+        secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}  
     - name: use-action
       uses: ./

@@ -1851,6 +1851,25 @@ const docker = __webpack_require__(894)();
 
     core.info("Will build Dockerfile at " + path + " as " + name + ":" + normalisedBranch + "-" + nextVersion);
 
+    const dockerAuth = {
+        username: process.env.DOCKER_HUB_USERNAME,
+        password: process.env.DOCKER_HUB_PASSWORD,
+        serveraddress: 'https://index.docker.io/v1'
+    };
+
+    docker.pull('leanix/k8s-deploy', {'authconfig': dockerAuth}, function (err, stream) {
+        docker.modem.followProgress(stream, onFinished, onProgress);
+
+        function onFinished(err, output) {
+            if (err) {
+                core.error(err)
+            }
+            core.info(output);
+        }
+        function onProgress(event) {
+        }
+    });
+
 })();
 
 
