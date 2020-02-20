@@ -1,0 +1,21 @@
+{
+  "name": "release-docker-image-action",
+  "description": "Github Action to build, tag and push a docker image.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leanix/release-docker-image-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/leanix/release-docker-image-action/issues"
+  },
+  "homepage": "https://github.com/leanix/release-docker-image-action#readme",
+  "dependencies": {
+    "@actions/core": "1.2.2",
+    "@actions/exec": "1.0.3",
+    "simple-git": "1.131.0"
+  }
+}
