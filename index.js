@@ -47,7 +47,7 @@ const fs = require('fs');
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
         } else {
-            nextVersion=currentVersion + 1;
+            nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
             await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
             await git.pushTags();
