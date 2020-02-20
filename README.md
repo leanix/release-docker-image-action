@@ -6,6 +6,7 @@ This very opinionated Github Action helps you to build a versioned docker image.
 
 ```
 uses: leanix/release-docker-image-action@master
+id: build-image
 with:
   name: leanix/foo # Optional, by default the name of the Github repository is used
   path: docker/    # Optional, path to a folder containing a Dockerfile, by default . is used
@@ -25,6 +26,12 @@ VERSION-MASTER-2
 VERSION-MASTER-3
 VERSION-FEATURE-HOOK-1333-ADD-ACTION-1
 VERSION-FEATURE-HOOK-1333-ADD-ACTION-2
+```
+
+To use the generated image tag in one of the following steps, use the output variable "tag":
+
+```
+run: echo ${{ steps.build-image.outputs.tag }
 ```
 
 # Update Action
