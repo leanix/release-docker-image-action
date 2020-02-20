@@ -16,7 +16,7 @@ This action requires that you also use the "leanix/secrets-action@master".
 
 # Details
 
-The action will use *git tags* to manage a version that is used to tag the docker image. It will search for tags called "VERSION-<BRANCH>-<NUMBER>" on the current branch, where <BRANCH> is the name of the branch and <NUMBER> is a version. If it does not find one, it will start with version 1.
+The action will use *git tags* to manage a version that is used to tag the docker image. It will search for tags called "VERSION-BRANCH-NUMBER" on the current branch, where BRANCH is the name of the branch and NUMBER is a version. If it does not find one, it will start with version 1.
 If it finds tags, it will use the highest version to determain the next version. It only does that though, if the highest tag is not already pointing to the changeset currently build.
 
 ```
