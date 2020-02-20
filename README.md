@@ -31,7 +31,7 @@ VERSION-FEATURE-HOOK-1333-ADD-ACTION-2
 To use the generated image tag in one of the following steps, use the output variable "tag":
 
 ```
-run: echo ${{ steps.build-image.outputs.tag }
+run: echo ${{ steps.build-image.outputs.tag }}
 ```
 
 # Update Action
