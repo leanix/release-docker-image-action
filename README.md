@@ -34,6 +34,10 @@ To use the generated image tag in one of the following steps, use the output var
 run: echo ${{ steps.build-image.outputs.tag }}
 ```
 
+In addition the action will also push/update a docker tag for the latest version of each branch:
+* feature/HOOK-1333-ADD-ACTION => feature-hook-1333-add-action-latest
+* master => latest
+
 # Update Action
 
 When you change the action code, use the script *update-dist.sh* to generate a compiled version of index.js containing all dependencies.

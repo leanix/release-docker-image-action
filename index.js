@@ -72,6 +72,16 @@ const fs = require('fs');
         core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
         await exec.exec('docker', ['build', '-t', nameWithVersion, path], options);
         await exec.exec('docker', ['push', nameWithVersion], options);
+
+        // Also push a "latest" tag
+        let latestTag = normalisedBranch + "-latest";
+        if (normalisedBranch == "master") {
+            latestTag = "latest";
+        }
+        const nameWithLatestTag = name + ":" + latestTag;
+        await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
+        await exec.exec('docker', ['push', nameWithLatestTag], options);
+
         core.setOutput('tag', versionTag);
 
     } catch (e) {
