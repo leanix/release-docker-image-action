@@ -1716,7 +1716,7 @@ const fs = __webpack_require__(747);
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
         } else {
-            nextVersion=currentVersion + 1;
+            nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
             await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
             await git.pushTags();
@@ -1741,7 +1741,18 @@ const fs = __webpack_require__(747);
         core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
         await exec.exec('docker', ['build', '-t', nameWithVersion, path], options);
         await exec.exec('docker', ['push', nameWithVersion], options);
+
+        // Also push a "latest" tag
+        let latestTag = normalisedBranch + "-latest";
+        if (normalisedBranch == "master") {
+            latestTag = "latest";
+        }
+        const nameWithLatestTag = name + ":" + latestTag;
+        await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
+        await exec.exec('docker', ['push', nameWithLatestTag], options);
+
         core.setOutput('tag', versionTag);
+        core.setOutput('latest_tag', latestTag);
 
     } catch (e) {
         core.setFailed(e.message);
