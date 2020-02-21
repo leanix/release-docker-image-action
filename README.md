@@ -28,11 +28,16 @@ VERSION-FEATURE-HOOK-1333-ADD-ACTION-1
 VERSION-FEATURE-HOOK-1333-ADD-ACTION-2
 ```
 
-To use the generated image tag in one of the following steps, use the output variable "tag":
+In addition the action will also push/update a docker tag for the latest version of each branch:
+* feature/HOOK-1333-ADD-ACTION => feature-hook-1333-add-action-latest
+* master => latest
+
+To use the generated image tags in one of the following steps, use the output variables "tag" or "latest_tag":
 
 ```
-run: echo ${{ steps.build-image.outputs.tag }}
+run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.latest_tag }}
 ```
+
 
 # Update Action
 
