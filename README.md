@@ -8,8 +8,9 @@ This very opinionated Github Action helps you to build a versioned docker image.
 uses: leanix/release-docker-image-action@master
 id: build-image
 with:
-  name: leanix/foo # Optional, by default the name of the Github repository is used
-  path: docker/    # Optional, path to a folder containing a Dockerfile, by default . is used
+  name: leanix/foo             # Optional, by default the name of the Github repository is used
+  path: docker/                # Optional, path to a folder containing a Dockerfile, by default . is used
+  dockerfile: main.dockerfile  # Optional, path to a dockerfile if the filename is not "Dockerfile" (-f parameter of docker build)
 ```
 
 This action requires that you also use the "leanix/secrets-action@master".
