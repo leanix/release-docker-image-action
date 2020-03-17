@@ -44,3 +44,6 @@ run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.lat
 
 When you change the action code, use the script *update-dist.sh* to generate a compiled version of index.js containing all dependencies.
 
+## Copyright and license
+
+Copyright 2020 LeanIX GmbH under the [Unlicense license](LICENSE).
