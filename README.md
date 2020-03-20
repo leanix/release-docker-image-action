@@ -11,6 +11,7 @@ with:
   name: leanix/foo             # Optional, by default the name of the Github repository is used
   path: docker/                # Optional, path to a folder containing a Dockerfile, by default . is used
   dockerfile: main.dockerfile  # Optional, path to a dockerfile if the filename is not "Dockerfile" (-f parameter of docker build)
+  only-output-tags: true       # Optional, whether to only output the tags again and not build & push the image, by default false
 ```
 
 This action requires that you also use the "leanix/secrets-action@master".
@@ -39,6 +40,21 @@ To use the generated image tags in one of the following steps, use the output va
 run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.latest_tag }}
 ```
 
+# Output-only mode
+
+If you only want to get the tags output again, e.g. because you deploy with a different job, simply reuse the action in output-only mode:
+
+```
+uses: leanix/release-docker-image-action@master
+id: image-tags
+with:
+  only-output-tags: true
+```
+
+You can then again access the version tags with:
+```
+run: echo ${{ steps.image-tags.outputs.tag }} ${{ steps.image-tags.outputs.latest_tag }}
+```
 
 # Update Action
 

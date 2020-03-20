@@ -14,6 +14,15 @@ jobs:
       with:
         secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}  
     - name: use-action
+      id: build-image
       uses: ./
       with:
         path: test/
+    - run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.latest_tag }}
+    - name: use-action-in-output-only-mode
+      id: image-tags
+      uses: ./
+      with:
+        only-output-tags: true
+    - run: echo ${{ steps.image-tags.outputs.tag }} ${{ steps.image-tags.outputs.latest_tag }}
+    - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags.outputs.tag }}" ]]'

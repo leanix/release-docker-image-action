@@ -1673,7 +1673,6 @@ const git = __webpack_require__(915)();
 const fs = __webpack_require__(747);
 
 (async () => {
-
     try {
 
         // Fail fast, we can only handle pushes to branches
@@ -1682,19 +1681,25 @@ const fs = __webpack_require__(747);
         }
 
         // Define some parameters
+        let name = core.getInput('name');
+        if (name == "") {
+            name = process.env.GITHUB_REPOSITORY;
+        }
         const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
         const normalisedBranch = branch.replace(/[\W]+/, '-');
         const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
         const currentCommit = process.env.GITHUB_SHA;
+        let latestTag = normalisedBranch + "-latest";
+        if (normalisedBranch == "master") {
+            latestTag = "latest";
+        }
+        const nameWithLatestTag = name + ":" + latestTag;
         let currentVersion=0;
         let taggedCommit;
         let nextVersion;
         let path = core.getInput('path');
-        let name = core.getInput('name');
+        let onlyOutputTags = core.getInput('only-output-tags') == 'true'
         let dockerfile = core.getInput('dockerfile');
-        if (name == "") {
-            name = process.env.GITHUB_REPOSITORY;
-        }
 
         // Fetch tags and look for existing one matching the current versionTagPrefix
         await git.fetch(['--tags']);
@@ -1717,49 +1722,47 @@ const fs = __webpack_require__(747);
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
         } else {
+            if (onlyOutputTags) {
+                throw new Error("only-output-tags mode can only be used if there has already been released an image for this commit.")
+            }
             nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
             await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
             await git.pushTags();
         }
-
-        // Configure docker
-        const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
-        fs.mkdirSync(dockerConfigDirectory);
-        fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({
-            auths: {
-                "https://index.docker.io/v1/": {
-                    auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
-                }
-            }
-        }));
-        core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
-
-        // Now build the docker image tagged with the correct version and push it
         const versionTag = normalisedBranch + "-" + nextVersion
         const nameWithVersion = name + ":" + versionTag;
-        const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
-        core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
-        dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
-        await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
-        await exec.exec('docker', ['push', nameWithVersion], options);
 
-        // Also push a "latest" tag
-        let latestTag = normalisedBranch + "-latest";
-        if (normalisedBranch == "master") {
-            latestTag = "latest";
+        if (!onlyOutputTags) {
+            // Configure docker
+            const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
+            fs.mkdirSync(dockerConfigDirectory);
+            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({
+                auths: {
+                    "https://index.docker.io/v1/": {
+                        auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
+                    }
+                }
+            }));
+            core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
+
+            // Now build the docker image tagged with the correct version and push it
+            const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
+            core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
+            dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
+            await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
+            await exec.exec('docker', ['push', nameWithVersion], options);
+
+            // Also push a "latest" tag
+            await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
+            await exec.exec('docker', ['push', nameWithLatestTag], options);
         }
-        const nameWithLatestTag = name + ":" + latestTag;
-        await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
-        await exec.exec('docker', ['push', nameWithLatestTag], options);
 
         core.setOutput('tag', versionTag);
         core.setOutput('latest_tag', latestTag);
-
     } catch (e) {
         core.setFailed(e.message);
     }
-
 })();
 
 
