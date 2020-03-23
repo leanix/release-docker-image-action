@@ -8,6 +8,9 @@ inputs:
     description: 'Name of the image to build, defaults to name of the repository'
   dockerfile:
     description: 'Optional of to the dockerfile (-f parameter of docker build)'
+  only-output-tags:
+    description: 'Whether to only output current tag again, defaults to false'
+    default: false
 outputs:
   tag:
     description: 'The tag that was build and pushed'
