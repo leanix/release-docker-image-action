@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:experimental
+
 FROM ubuntu
 
 RUN echo "Building a test image..."
