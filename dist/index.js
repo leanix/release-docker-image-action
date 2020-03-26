@@ -1750,7 +1750,7 @@ const fs = __webpack_require__(747);
             const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
             core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
             dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
-            await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
+            await exec.exec('docker', ['build', '--ssh', 'default', '-t', nameWithVersion, ...dockerfile_param, path], options);
             await exec.exec('docker', ['push', nameWithVersion], options);
 
             // Also push a "latest" tag
@@ -2688,9 +2688,9 @@ module.exports = function (baseDir) {
 /***/ }),
 
 /***/ 191:
-/***/ (function() {
+/***/ (function(module) {
 
-eval("require")("supports-color");
+module.exports = eval("require")("supports-color");
 
 
 /***/ }),
