@@ -12,7 +12,10 @@ jobs:
     - name: Get credentials
       uses: leanix/secrets-action@master
       with:
-        secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}  
+        secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}
+    - uses: webfactory/ssh-agent@v0.2.0
+      with:
+        ssh-private-key: ${{ env.CI_GITHUB_SSH_PRIVATE_KEY }}
     - name: use-action
       id: build-image
       uses: ./
