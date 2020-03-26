@@ -77,6 +77,8 @@ const fs = require('fs');
             }));
             core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
 
+            core.exportVariable('DOCKER_BUILDKIT', '1');
+
             // Now build the docker image tagged with the correct version and push it
             const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
             core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
