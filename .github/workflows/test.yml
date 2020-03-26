@@ -12,7 +12,7 @@ jobs:
     - name: Get credentials
       uses: leanix/secrets-action@master
       with:
-        secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}  
+        secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}
     - name: use-action
       id: build-image
       uses: ./
