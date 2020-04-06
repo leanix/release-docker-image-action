@@ -53,9 +53,6 @@ const fs = require('fs');
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
         } else {
-            if (onlyOutputTags) {
-                throw new Error("only-output-tags mode can only be used if there has already been released an image for this commit.")
-            }
             nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
             await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);

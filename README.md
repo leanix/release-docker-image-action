@@ -42,7 +42,7 @@ run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.lat
 
 # Output-only mode
 
-If you only want to get the tags output again e.g. because you deploy with a different job, simply reuse the action in output-only mode:
+If you only want to set or output the current tags e.g. because you build or deploy with a different job, simply reuse the action in output-only mode:
 
 ```
 uses: leanix/release-docker-image-action@master
