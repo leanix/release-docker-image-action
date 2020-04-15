@@ -3546,18 +3546,33 @@ const fs = __webpack_require__(747);
 
         // Fetch tags and look for existing one matching the current versionTagPrefix
         await git.fetch(['--tags']);
-        const tagsString = await git.tag(
+        const tagsOfCurrentCommitString = await git.tag(
             [
                 '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
-                '--sort', '-v:refname' // ...and sort them in reverse
+                '--points-at', currentCommit, // ...and that point at our current commit...
+                '--sort', '-v:refname' // ...and sort them in reverse in case there is more than one
             ]
         );
 
-        // If we found one, use it to update the current version and set the tagged commit
-        if (tagsString.length > 0) {
-            const tags = tagsString.split('\n');
-            currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
-            taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
+        if (tagsOfCurrentCommitString.length > 0) {
+            // If the commit is already tagged, we use that tag
+            const tagsOfCurrentCommit = tagsOfCurrentCommitString.split('\n');
+            currentVersion=parseInt(tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
+            taggedCommit = currentCommit;
+        } else {
+            // Otherwise we determine the latest version tag such that we can create a new tag with an incremented version number
+            const tagsString = await git.tag(
+                [
+                    '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
+                    '--sort', '-v:refname' // ...and sort them in reverse
+                ]
+            );
+            // If we found one, use it to update the current version and set the tagged commit
+            if (tagsString.length > 0) {
+                const tags = tagsString.split('\n');
+                currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
+                taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
+            }
         }
 
         // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
