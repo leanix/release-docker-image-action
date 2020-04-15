@@ -26,7 +26,7 @@ jobs:
         only-output-tags: true
     - run: echo ${{ steps.image-tags.outputs.tag }} ${{ steps.image-tags.outputs.latest_tag }}
     - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags.outputs.tag }}" ]]'
-    - run: git commit --allow-empty -m "New concurrent version" && git tag ${{ steps.image-tags.outputs.git_tag }}0
+    - run: git config --global user.email "pipeline@leanix.net" && git config --global user.name "Pipeline" && git commit --allow-empty -m "New concurrent version" && git tag ${{ steps.image-tags.outputs.git_tag }}0
     - name: use-action-in-output-only-mode
       id: image-tags-concurrent
       uses: ./
