@@ -16,6 +16,6 @@
   "dependencies": {
     "@actions/core": "1.2.2",
     "@actions/exec": "1.0.3",
-    "simple-git": "1.131.0"
+    "simple-git": "1.132.0"
   }
 }
