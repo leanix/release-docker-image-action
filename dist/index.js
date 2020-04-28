@@ -3529,7 +3529,7 @@ const fs = __webpack_require__(747);
             name = process.env.GITHUB_REPOSITORY;
         }
         const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
-        const normalisedBranch = branch.replace(/[\W]+/, '-');
+        const normalisedBranch = branch.replace(/\W+/g, '-');
         const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
         const currentCommit = process.env.GITHUB_SHA;
         let latestTag = normalisedBranch + "-latest";
