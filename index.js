@@ -21,7 +21,7 @@ const fs = require('fs');
         const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
         const currentCommit = process.env.GITHUB_SHA;
         let latestTag = normalisedBranch + "-latest";
-        if (normalisedBranch == "master") {
+        if (["master", "main"].includes(normalisedBranch)) {
             latestTag = "latest";
         }
         const nameWithLatestTag = name + ":" + latestTag;
