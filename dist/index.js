@@ -19,7 +19,13 @@ module.exports =
 /******/ 		};
 /******/
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete installedModules[moduleId];
+/******/ 		}
 /******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
@@ -3533,7 +3539,7 @@ const fs = __webpack_require__(747);
         const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
         const currentCommit = process.env.GITHUB_SHA;
         let latestTag = normalisedBranch + "-latest";
-        if (normalisedBranch == "master") {
+        if (["master", "main"].includes(normalisedBranch)) {
             latestTag = "latest";
         }
         const nameWithLatestTag = name + ":" + latestTag;
