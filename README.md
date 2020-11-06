@@ -12,6 +12,7 @@ with:
   path: docker/                # Optional, path to a folder containing a Dockerfile, by default . is used
   dockerfile: main.dockerfile  # Optional, path to a dockerfile if the filename is not "Dockerfile" (-f parameter of docker build)
   only-output-tags: true       # Optional, whether to only output the tags again and not build & push the image, by default false
+  registry: acr                # Optional, registry to use, allowed values are docker-hub or acr, default is docker-hub
 ```
 
 This action requires that you also use the "leanix/secrets-action@master".
