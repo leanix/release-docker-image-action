@@ -3629,7 +3629,7 @@ const fs = __webpack_require__(747);
             name = process.env.GITHUB_REPOSITORY;
         }
         if (core.getInput('registry') == 'acr') {
-            name = 'leanix.azurecr.io/' + name
+            name = 'leanix.azurecr.io/' + name.substring('leanix/'.length)
         }
         const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
         const normalisedBranch = branch.replace(/\W+/g, '-');
