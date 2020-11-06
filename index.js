@@ -7,7 +7,7 @@ const fs = require('fs');
     try {
 
         // Fail fast, we can only handle pushes to branches
-        if (!process.env.GITHUB_REF || !process.env.GITHUB_REF.match(/^refs\/heads\//)) {
+        if (!process.env.GITHUB_REF || !process.env.GITHUB_REF.match(/^refs\/heads\//)) {
             throw new Exception("No branch given via process.env.GITHUB_REF");
         }
 
@@ -17,7 +17,7 @@ const fs = require('fs');
             name = process.env.GITHUB_REPOSITORY;
         }
         if (core.getInput('registry') == 'acr') {
-            name = 'leanix.azurecr.io/' + name.substring('leanix/'.length)
+            name = process.env.ACR_LOGIN + name.substring('leanix/'.length)
         }
         const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
         const normalisedBranch = branch.replace(/\W+/g, '-');
@@ -28,7 +28,7 @@ const fs = require('fs');
             latestTag = "latest";
         }
         const nameWithLatestTag = name + ":" + latestTag;
-        let currentVersion=0;
+        let currentVersion = 0;
         let taggedCommit;
         let nextVersion;
         let path = core.getInput('path');
@@ -48,7 +48,7 @@ const fs = require('fs');
         if (tagsOfCurrentCommitString.length > 0) {
             // If the commit is already tagged, we use that tag
             const tagsOfCurrentCommit = tagsOfCurrentCommitString.split('\n');
-            currentVersion=parseInt(tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
+            currentVersion = parseInt(tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
             taggedCommit = currentCommit;
         } else {
             // Otherwise we determine the latest version tag such that we can create a new tag with an incremented version number
@@ -61,7 +61,7 @@ const fs = require('fs');
             // If we found one, use it to update the current version and set the tagged commit
             if (tagsString.length > 0) {
                 const tags = tagsString.split('\n');
-                currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
+                currentVersion = parseInt(tags[0].replace(versionTagPrefix, ''));
                 taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
             }
         }
@@ -92,13 +92,13 @@ const fs = require('fs');
 
             const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
             fs.mkdirSync(dockerConfigDirectory);
-            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({auths: auths}));
+            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({ auths: auths }));
             core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
 
             // Now build the docker image tagged with the correct version and push it
-            const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
+            const options = { stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString()) };
             core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
-            dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
+            dockerfile_param = ((dockerfile == "") ? [] : ["-f", dockerfile])
             await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
             await exec.exec('docker', ['push', nameWithVersion], options);
 
