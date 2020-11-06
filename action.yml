@@ -11,6 +11,9 @@ inputs:
   only-output-tags:
     description: 'Whether to only output current tag again, defaults to false'
     default: false
+  registry:
+    description: 'Whether to use docker-hub or acr, defaults to docker-hub'
+    default: 'docker-hub'
 outputs:
   tag:
     description: 'The tag that was build and pushed'

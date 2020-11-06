@@ -3628,6 +3628,9 @@ const fs = __webpack_require__(747);
         if (name == "") {
             name = process.env.GITHUB_REPOSITORY;
         }
+        if (core.getInput('registry') == 'acr') {
+            name = 'leanix.azurecr.io/' + name.substring('leanix/'.length)
+        }
         const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
         const normalisedBranch = branch.replace(/\W+/g, '-');
         const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
@@ -3690,15 +3693,18 @@ const fs = __webpack_require__(747);
 
         if (!onlyOutputTags) {
             // Configure docker
+            let auths = {
+                "https://index.docker.io/v1/": {
+                    auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
+                }
+            }
+            auths[process.env.ACR_LOGIN] = {
+                auth: Buffer.from(process.env.ACR_USERNAME + ':' + process.env.ACR_PASSWORD).toString('base64')
+            }
+
             const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
             fs.mkdirSync(dockerConfigDirectory);
-            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({
-                auths: {
-                    "https://index.docker.io/v1/": {
-                        auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
-                    }
-                }
-            }));
+            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({auths: auths}));
             core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
 
             // Now build the docker image tagged with the correct version and push it
