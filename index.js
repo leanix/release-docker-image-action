@@ -73,8 +73,14 @@ const fs = require('fs');
         } else {
             nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
-            await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
-            await git.pushTags();
+            // When running multiple deployments at once, a race condition can occur causing multiple deployments to attempt to push the same
+            // tag to Github. All but the first will fail.
+            try {
+                await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
+                await git.pushTags();
+            } catch (e) {
+                core.warning('Tag could not be pushed to GitHub: ' + e.message);
+            }
         }
         const versionTag = normalisedBranch + "-" + nextVersion
         const nameWithVersion = name + ":" + versionTag;
