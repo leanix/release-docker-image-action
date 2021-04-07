@@ -24,6 +24,12 @@ jobs:
       with:
         path: test/
         registry: acr
+    - name: use-action-for-acr-public
+      id: build-image-for-acr-public
+      uses: ./
+      with:
+        path: test/
+        registry: acr-public
     - run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.latest_tag }}
     - name: use-action-in-output-only-mode
       id: image-tags

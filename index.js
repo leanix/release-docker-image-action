@@ -19,6 +19,9 @@ const fs = require('fs');
         if (core.getInput('registry') == 'acr') {
             name = process.env.ACR_LOGIN + '/' + name.substring('leanix/'.length)
         }
+        if (core.getInput('registry') == 'acr-public') {
+            name = process.env.ACR_PUBLIC_LOGIN + '/' + name.substring('leanix/'.length)
+        }
         const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
         const normalisedBranch = branch.replace(/\W+/g, '-');
         const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
@@ -88,6 +91,9 @@ const fs = require('fs');
             }
             auths[process.env.ACR_LOGIN] = {
                 auth: Buffer.from(process.env.ACR_USERNAME + ':' + process.env.ACR_PASSWORD).toString('base64')
+            }
+            auths[process.env.ACR_PUBLIC_LOGIN] = {
+                auth: Buffer.from(process.env.ACR_PUBLIC_USERNAME + ':' + process.env.ACR_PUBLIC_PASSWORD).toString('base64')
             }
 
             const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
