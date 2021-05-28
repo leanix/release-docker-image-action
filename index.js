@@ -113,10 +113,9 @@ const fs = require('fs');
             core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
             dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
             if (enableCache) {
-                const builderArgs = ['--builder', builder];
                 const nameWithCurrentVersion = "leanix/leanix-recon" + ":" + normalisedBranch + "-" + currentVersion;
                 const cachingArgs = ["--cache-from", "type=registry,ref=" + nameWithCurrentVersion, "--cache-to", "type=inline"];
-                await exec.exec('docker', ['buildx', 'build', ...builderArgs, ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
+                await exec.exec('docker', ['buildx', 'build', ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
             }
             else {
                 await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
