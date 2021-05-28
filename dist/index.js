@@ -1778,7 +1778,7 @@ const fs = __webpack_require__(747);
             dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
             if (enableCache) {
                 const builderArgs = ['--builder', builder];
-                const nameWithCurrentVersion = name + ":" + normalisedBranch + "-" + currentVersion;
+                const nameWithCurrentVersion = core.getInput('name') + ":" + normalisedBranch + "-" + currentVersion;
                 const cachingArgs = ["--cache-from", "type=registry," + nameWithCurrentVersion, "--cache-to", "type=inline"];
                 await exec.exec('docker', ['buildx', 'build', ...builderArgs, ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
             }
