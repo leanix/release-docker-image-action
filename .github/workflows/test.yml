@@ -47,13 +47,13 @@ jobs:
     - run: echo ${{ steps.image-tags-concurrent.outputs.tag }} ${{ steps.image-tags-concurrent.outputs.latest_tag }}
     - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags-concurrent.outputs.tag }}" ]]'
     - name: use-action-cached
-      id: build-image
+      id: build-image-cached
       uses: ./
       with:
         path: test/
         enable-cache: true
-     - name: use-action-for-acr
-      id: build-image-for-acr
+     - name: use-action-for-acr-cached
+      id: build-image-for-acr-cached
       uses: ./
       with:
         path: test/
