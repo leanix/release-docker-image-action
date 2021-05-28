@@ -115,7 +115,7 @@ const fs = require('fs');
             if (enableCache) {
                 const builderArgs = ['--builder', builder];
                 const nameWithCurrentVersion = name + ":" + normalisedBranch + "-" + currentVersion;
-                const cachingArgs = ["--caching-from", "type=registry," + nameWithCurrentVersion, "--caching-to", "type=inline"];
+                const cachingArgs = ["--cache-from", "type=registry," + nameWithCurrentVersion, "--cache-to", "type=inline"];
                 await exec.exec('docker', ['buildx', 'build', ...builderArgs, ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
             }
             else {
