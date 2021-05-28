@@ -40,10 +40,7 @@ const fs = require('fs');
 
         // Parameters for caching
         let enableCache = core.getInput('enable-cache') == 'true';
-        let builder = core.getInput('builder');
-        if (enableCache && builder == "") {
-            throw new Exception("builder must be set, if caching is enabled");
-        }
+
 
         // Fetch tags and look for existing one matching the current versionTagPrefix
         await git.fetch(['--tags']);
@@ -113,7 +110,7 @@ const fs = require('fs');
             core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
             dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
             if (enableCache) {
-                const nameWithCurrentVersion = "leanix/leanix-recon" + ":" + normalisedBranch + "-" + currentVersion;
+                const nameWithCurrentVersion = name + ":" + normalisedBranch + "-" + currentVersion;
                 const cachingArgs = ["--cache-from", "type=registry,ref=" + nameWithCurrentVersion, "--cache-to", "type=inline"];
                 await exec.exec('docker', ['buildx', 'build', ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
             }

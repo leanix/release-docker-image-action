@@ -17,8 +17,6 @@ inputs:
   enable-cache:
     description: 'Enable caching docker layers'
     default: false
-  builder:
-    description: 'Builder to use. If caching is enabled, you need to pass a buildx builder.'
 outputs:
   tag:
     description: 'The tag that was build and pushed'
