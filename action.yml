@@ -16,7 +16,7 @@ inputs:
     default: 'docker-hub'
   enable-cache:
     description: 'Enable caching docker layers'
-    default: false
+    default: true
 outputs:
   tag:
     description: 'The tag that was build and pushed'
