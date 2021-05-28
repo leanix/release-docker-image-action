@@ -52,7 +52,7 @@ jobs:
       with:
         path: test/
         enable-cache: true
-     - name: use-action-for-acr-cached
+    - name: use-action-for-acr-cached
       id: build-image-for-acr-cached
       uses: ./
       with:
