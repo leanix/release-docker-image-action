@@ -38,6 +38,13 @@ const fs = require('fs');
         let onlyOutputTags = core.getInput('only-output-tags') == 'true'
         let dockerfile = core.getInput('dockerfile');
 
+        // Parameters for caching
+        let enableCache = core.getInput('enable-cache') == 'true';
+        let builder = core.getInput('builder');
+        if (enableCache && builder == "") {
+            throw new Exception("builder must be set, if caching is enabled");
+        }
+
         // Fetch tags and look for existing one matching the current versionTagPrefix
         await git.fetch(['--tags']);
         const tagsOfCurrentCommitString = await git.tag(
@@ -105,9 +112,17 @@ const fs = require('fs');
             const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
             core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
             dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
-            await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
-            await exec.exec('docker', ['push', nameWithVersion], options);
+            if (enableCache) {
+                const builderArgs = ['build', '--builder'];
+                const nameWithCurrentVersion = name + ":" + normalisedBranch + "-" + currentVersion;
+                const cachingArgs = ["--caching-from", "type=registry," + nameWithCurrentVersion, "--caching-to", "type=inline"];
+                await exec.exec('docker', ['buildx', ...builderArgs, ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
+            }
+            else {
+                await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
 
+            }
+            await exec.exec('docker', ['push', nameWithVersion], options);
             // Also push a "latest" tag
             await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
             await exec.exec('docker', ['push', nameWithLatestTag], options);
