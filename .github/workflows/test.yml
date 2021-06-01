@@ -46,3 +46,16 @@ jobs:
         only-output-tags: true
     - run: echo ${{ steps.image-tags-concurrent.outputs.tag }} ${{ steps.image-tags-concurrent.outputs.latest_tag }}
     - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags-concurrent.outputs.tag }}" ]]'
+    - name: use-action-cache
+      id: build-image-no-cache
+      uses: ./
+      with:
+        path: test/
+        enable-cache: false
+    - name: use-action-for-acr-no-cache
+      id: build-image-for-acr-no-cache
+      uses: ./
+      with:
+        path: test/
+        registry: acr
+        enable-cache: false
