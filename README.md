@@ -8,12 +8,13 @@ This very opinionated Github Action helps you to build a versioned docker image.
 uses: leanix/release-docker-image-action@master
 id: build-image
 with:
-  name: leanix/foo             # Optional, by default the name of the Github repository is used
-  path: docker/                # Optional, path to a folder containing a Dockerfile, by default . is used
-  dockerfile: main.dockerfile  # Optional, path to a dockerfile if the filename is not "Dockerfile" (-f parameter of docker build)
-  only-output-tags: true       # Optional, whether to only output the tags again and not build & push the image, by default false
-  registry: acr                # Optional, registry to use, allowed values are docker-hub or acr, default is docker-hub
-  enable-cache: true           # Optional, enable caching of docker layers to registry to speed up build process, default is true
+  name: leanix/foo                # Optional, by default the name of the Github repository is used
+  path: docker/                   # Optional, path to a folder containing a Dockerfile, by default . is used
+  dockerfile: main.dockerfile     # Optional, path to a dockerfile if the filename is not "Dockerfile" (-f parameter of docker build)
+  only-output-tags: true          # Optional, whether to only output the tags again and not build & push the image, by default false
+  registry: acr                   # Optional, registry to use, allowed values are docker-hub or acr, default is docker-hub
+  enable-cache: true              # Optional, enable caching of docker layers to registry to speed up build process, default is true
+  always-increment-version: false # Optional, always increment the version number and create a new git tag
 ```
 
 This action requires that you also use the "leanix/secrets-action@master".
