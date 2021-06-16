@@ -17,6 +17,9 @@ inputs:
   enable-cache:
     description: 'Enable caching docker layers'
     default: true
+  always-increment-version:
+    description: 'Always increment the version number and create a new tag'
+    default: false
 outputs:
   tag:
     description: 'The tag that was build and pushed'
