@@ -36,6 +36,7 @@ const fs = require('fs');
         let nextVersion;
         let path = core.getInput('path');
         let onlyOutputTags = core.getInput('only-output-tags') == 'true'
+        const alwaysIncrementVersion = core.getInput('always-increment-version') == 'true'
         let dockerfile = core.getInput('dockerfile');
 
         // Parameters for caching
@@ -74,7 +75,7 @@ const fs = require('fs');
         }
 
         // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
-        if (taggedCommit == currentCommit) {
+        if (taggedCommit == currentCommit && !alwaysIncrementVersion) {
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
         } else {
