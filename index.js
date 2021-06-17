@@ -75,6 +75,7 @@ const fs = require('fs');
         }
 
         // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
+        core.info("always-increment-version="+alwaysIncrementVersion+", equalCommits="+(taggedCommit == currentCommit));
         if (taggedCommit == currentCommit && !alwaysIncrementVersion) {
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
