@@ -60,7 +60,7 @@ jobs:
         registry: acr
         enable-cache: false
     - run: echo ${{ steps.build-image-for-acr-no-cache.outputs.tag }} ${{ steps.build-image-for-acr-no-cache.outputs.latest_tag }}
-    - name: use-action-for-acr-no-cache
+    - name: increment-version
       id: use-action-output-only-increment-version
       uses: ./
       with:
