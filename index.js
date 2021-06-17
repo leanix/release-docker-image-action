@@ -75,13 +75,16 @@ const fs = require('fs');
         }
 
         // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
-        // In case the 'always-increment-version' input is set to true, always increment and push the tag
+        // In case the 'always-increment-version' input is set to true, always increment the version
         if (taggedCommit == currentCommit && !alwaysIncrementVersion) {
             core.info("Current commit is already tagged with version " + currentVersion);
             nextVersion = currentVersion;
         } else {
             nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
+        }
+        core.info("tagsOfCurrentCommitString="+tagsOfCurrentCommitString+", versionTagPrefix + nextVersion="+ (versionTagPrefix + nextVersion));
+        if (!tagsOfCurrentCommitString.includes(versionTagPrefix + nextVersion + '\n')) {
             await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
             await git.pushTags();
         }
