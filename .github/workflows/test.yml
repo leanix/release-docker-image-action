@@ -67,4 +67,4 @@ jobs:
         only-output-tags: true
         always-increment-version: true
     - run: echo ${{ steps.use-action-to-increment-version.outputs.tag }} ${{ steps.use-action-to-increment-version.outputs.latest_tag }}
-    - run: '[[ "$((${{ steps.build-image.outputs.tag }} + 1))" == "${{ steps.use-action-to-increment-version.outputs.tag }}" ]]'
+    - run: '[[ "$((${{ steps.build-image.outputs.git_tag_version }} + 1))" == "${{ steps.use-action-to-increment-version.outputs.git_tag_version }}" ]]'

@@ -132,6 +132,7 @@ const fs = require('fs');
         core.setOutput('tag', versionTag);
         core.setOutput('latest_tag', latestTag);
         core.setOutput('git_tag', versionTagPrefix + nextVersion);
+        core.setOutput('git_tag_version', nextVersion);
     } catch (e) {
         core.setFailed(e.message);
     }
