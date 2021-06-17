@@ -60,11 +60,28 @@ jobs:
         registry: acr
         enable-cache: false
     - run: echo ${{ steps.build-image-for-acr-no-cache.outputs.tag }} ${{ steps.build-image-for-acr-no-cache.outputs.latest_tag }}
-    - name: use-action-to-increment-version
-      id: use-action-to-increment-version
-      uses: ./
-      with:
-        only-output-tags: true
-        always-increment-version: true
-    - run: echo ${{ steps.use-action-to-increment-version.outputs.tag }} ${{ steps.use-action-to-increment-version.outputs.latest_tag }}
-    - run: '[[ "$((${{ steps.build-image.outputs.git_tag_version }} + 1))" == "${{ steps.use-action-to-increment-version.outputs.git_tag_version }}" ]]'
+
+  test-version-increase:
+    name: test-${{ github.run_number }}-version-increase
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: Get credentials
+        uses: leanix/secrets-action@master
+        with:
+          secret-store-credentials: ${{ secrets.INJECTED_SECRET_STORE_CREDENTIALS }}
+      - name: use-action
+        id: build-image
+        uses: ./
+        with:
+          path: test/
+      - run: echo ${{ steps.build-image.outputs.tag }} ${{ steps.build-image.outputs.latest_tag }}
+      - name: use-action-to-increment-version
+        id: use-action-to-increment-version
+        uses: ./
+        with:
+          only-output-tags: true
+          always-increment-version: true
+      - run: echo ${{ steps.use-action-to-increment-version.outputs.tag }} ${{ steps.use-action-to-increment-version.outputs.latest_tag }}
+      - run: '[[ "$((${{ steps.build-image.outputs.git_tag_version }} + 1))" == "${{ steps.use-action-to-increment-version.outputs.git_tag_version }}" ]]'
