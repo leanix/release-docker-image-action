@@ -1758,7 +1758,6 @@ const fs = __webpack_require__(747);
             nextVersion = currentVersion + 1;
             core.info("Next version on branch " + branch + " is " + nextVersion);
         }
-        core.info("tagsOfCurrentCommitString="+tagsOfCurrentCommitString.split('\n')+", versionTagPrefix+nextVersion="+ (versionTagPrefix + nextVersion)+", includes="+tagsOfCurrentCommitString.split('\n').includes(versionTagPrefix + nextVersion));
         if (!tagsOfCurrentCommitString.split('\n').includes(versionTagPrefix + nextVersion)) {
             await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
             await git.pushTags();
