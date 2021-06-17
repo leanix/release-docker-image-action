@@ -64,6 +64,8 @@ jobs:
   test-version-increase:
     name: test-${{ github.run_number }}-version-increase
     runs-on: ubuntu-latest
+    needs:
+      - test
     steps:
       - name: checkout
         uses: actions/checkout@v2
