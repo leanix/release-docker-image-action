@@ -38,13 +38,6 @@ jobs:
         only-output-tags: true
     - run: echo ${{ steps.image-tags.outputs.tag }} ${{ steps.image-tags.outputs.latest_tag }}
     - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags.outputs.tag }}" ]]'
-    - name: use-action-to-increment-version
-      id: use-action-to-increment-version
-      uses: ./
-      with:
-        only-output-tags: true
-        always-increment-version: true
-    - run: echo ${{ steps.use-action-to-increment-version.outputs.tag }} ${{ steps.use-action-to-increment-version.outputs.latest_tag }}
     - run: git config --global user.email "pipeline@leanix.net" && git config --global user.name "Pipeline" && git commit --allow-empty -m "New concurrent version" && git tag ${{ steps.image-tags.outputs.git_tag }}0
     - name: use-action-in-output-only-mode
       id: image-tags-concurrent
@@ -52,7 +45,7 @@ jobs:
       with:
         only-output-tags: true
     - run: echo ${{ steps.image-tags-concurrent.outputs.tag }} ${{ steps.image-tags-concurrent.outputs.latest_tag }}
-    - run: '[[ "${{ steps.build-image.outputs.tag + 1 }}" == "${{ steps.image-tags-concurrent.outputs.tag }}" ]]'
+    - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags-concurrent.outputs.tag }}" ]]'
     - name: use-action-cache
       id: build-image-no-cache
       uses: ./
@@ -67,3 +60,11 @@ jobs:
         registry: acr
         enable-cache: false
     - run: echo ${{ steps.build-image-for-acr-no-cache.outputs.tag }} ${{ steps.build-image-for-acr-no-cache.outputs.latest_tag }}
+    - name: use-action-to-increment-version
+      id: use-action-to-increment-version
+      uses: ./
+      with:
+        only-output-tags: true
+        always-increment-version: true
+    - run: echo ${{ steps.use-action-to-increment-version.outputs.tag }} ${{ steps.use-action-to-increment-version.outputs.latest_tag }}
+    - run: '[[ "$((${{ steps.build-image.outputs.tag }} + 1))" == "${{ steps.use-action-to-increment-version.outputs.tag }}" ]]'
