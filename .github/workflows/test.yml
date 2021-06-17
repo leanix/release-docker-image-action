@@ -52,7 +52,7 @@ jobs:
       with:
         only-output-tags: true
     - run: echo ${{ steps.image-tags-concurrent.outputs.tag }} ${{ steps.image-tags-concurrent.outputs.latest_tag }}
-    - run: '[[ "${{ steps.build-image.outputs.tag }}" == "${{ steps.image-tags-concurrent.outputs.tag }}" ]]'
+    - run: '[[ "${{ steps.build-image.outputs.tag + 1 }}" == "${{ steps.image-tags-concurrent.outputs.tag }}" ]]'
     - name: use-action-cache
       id: build-image-no-cache
       uses: ./
