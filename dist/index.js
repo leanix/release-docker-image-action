@@ -1728,10 +1728,12 @@ const fs = __webpack_require__(747);
             ]
         );
 
+        core.info("tagsOfCurrentCommitString.length="+tagsOfCurrentCommitString.length+", versionTagPrefix="+versionTagPrefix);
         if (tagsOfCurrentCommitString.length > 0) {
             // If the commit is already tagged, we use that tag
             const tagsOfCurrentCommit = tagsOfCurrentCommitString.split('\n');
             currentVersion=parseInt(tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
+            core.info("currentVersion="+currentVersion+", taggesCommit="+currentCommit+", tagsOfCurrentCommit[0]="+tagsOfCurrentCommit[0]+", replace="+tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
             taggedCommit = currentCommit;
         } else {
             // Otherwise we determine the latest version tag such that we can create a new tag with an incremented version number
@@ -1746,6 +1748,7 @@ const fs = __webpack_require__(747);
                 const tags = tagsString.split('\n');
                 currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
                 taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
+                core.info("currentVersion="+currentVersion+", taggesCommit="+taggedCommit+", tags[0]="+tags[0]+", replace="+tags[0].replace(versionTagPrefix, ''));
             }
         }
 
