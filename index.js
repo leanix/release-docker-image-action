@@ -37,6 +37,7 @@ const fs = require('fs');
         let path = core.getInput('path');
         let onlyOutputTags = core.getInput('only-output-tags') == 'true'
         let dockerfile = core.getInput('dockerfile');
+        let pushTags = core.getInput('push-tags')  == 'true'
 
         // Parameters for caching
         let enableCache = core.getInput('enable-cache') == 'true';
@@ -119,8 +120,10 @@ const fs = require('fs');
 
             }
             await exec.exec('docker', ['push', nameWithVersion], options);
-            // Also push a "latest" tag
-            await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
+            if (pushTags) {
+                // Also push a "latest" tag
+                await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
+            }
             await exec.exec('docker', ['push', nameWithLatestTag], options);
         }
 

@@ -14,6 +14,7 @@ with:
   only-output-tags: true       # Optional, whether to only output the tags again and not build & push the image, by default false
   registry: acr                # Optional, registry to use, allowed values are docker-hub or acr, default is docker-hub
   enable-cache: true           # Optional, enable caching of docker layers to registry to speed up build process, default is true
+  push-tags: true              # Optional, enable pushing tags to the repository, default is true (useful for multi-repo to prevent pushing duplicated tags)
 ```
 
 This action requires that you also use the "leanix/secrets-action@master".
