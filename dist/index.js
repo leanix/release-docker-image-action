@@ -40,7 +40,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(422);
+/******/ 		return __webpack_require__(891);
 /******/ 	};
 /******/
 /******/ 	// run startup
@@ -49,2101 +49,7 @@ module.exports =
 /************************************************************************/
 /******/ ({
 
-/***/ 2:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-/**
- * Exports the utilities `simple-git` depends upon to allow for mocking during a test
- */
-module.exports = {
-
-   buffer: function () { return __webpack_require__(293).Buffer; },
-
-   childProcess: function () { return __webpack_require__(129); },
-
-   exists: __webpack_require__(759)
-
-};
-
-
-/***/ }),
-
-/***/ 7:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const os = __importStar(__webpack_require__(87));
-const utils_1 = __webpack_require__(830);
-/**
- * Commands
- *
- * Command Format:
- *   ::name key=value,key=value::message
- *
- * Examples:
- *   ::warning::This is the message
- *   ::set-env name=MY_VAR::some value
- */
-function issueCommand(command, properties, message) {
-    const cmd = new Command(command, properties, message);
-    process.stdout.write(cmd.toString() + os.EOL);
-}
-exports.issueCommand = issueCommand;
-function issue(name, message = '') {
-    issueCommand(name, {}, message);
-}
-exports.issue = issue;
-const CMD_STRING = '::';
-class Command {
-    constructor(command, properties, message) {
-        if (!command) {
-            command = 'missing.command';
-        }
-        this.command = command;
-        this.properties = properties;
-        this.message = message;
-    }
-    toString() {
-        let cmdStr = CMD_STRING + this.command;
-        if (this.properties && Object.keys(this.properties).length > 0) {
-            cmdStr += ' ';
-            let first = true;
-            for (const key in this.properties) {
-                if (this.properties.hasOwnProperty(key)) {
-                    const val = this.properties[key];
-                    if (val) {
-                        if (first) {
-                            first = false;
-                        }
-                        else {
-                            cmdStr += ',';
-                        }
-                        cmdStr += `${key}=${escapeProperty(val)}`;
-                    }
-                }
-            }
-        }
-        cmdStr += `${CMD_STRING}${escapeData(this.message)}`;
-        return cmdStr;
-    }
-}
-function escapeData(s) {
-    return utils_1.toCommandValue(s)
-        .replace(/%/g, '%25')
-        .replace(/\r/g, '%0D')
-        .replace(/\n/g, '%0A');
-}
-function escapeProperty(s) {
-    return utils_1.toCommandValue(s)
-        .replace(/%/g, '%25')
-        .replace(/\r/g, '%0D')
-        .replace(/\n/g, '%0A')
-        .replace(/:/g, '%3A')
-        .replace(/,/g, '%2C');
-}
-//# sourceMappingURL=command.js.map
-
-/***/ }),
-
-/***/ 14:
-/***/ (function(module) {
-
-
-module.exports = TagList;
-
-function TagList (tagList, latest) {
-   this.latest = latest;
-   this.all = tagList
-}
-
-TagList.parse = function (data, customSort) {
-   var number = function (input) {
-      if (typeof input === 'string') {
-         return parseInt(input.replace(/^\D+/g, ''), 10) || 0;
-      }
-
-      return 0;
-   };
-
-   var tags = data
-      .trim()
-      .split('\n')
-      .map(function (item) { return item.trim(); })
-      .filter(Boolean);
-
-   if (!customSort) {
-      tags.sort(function (tagA, tagB) {
-         var partsA = tagA.split('.');
-         var partsB = tagB.split('.');
-
-         if (partsA.length === 1 || partsB.length === 1) {
-            return tagA - tagB > 0 ? 1 : -1;
-         }
-
-         for (var i = 0, l = Math.max(partsA.length, partsB.length); i < l; i++) {
-            var a = number(partsA[i]);
-            var b = number(partsB[i]);
-
-            var diff = a - b;
-            if (diff) {
-               return diff > 0 ? 1 : -1;
-            }
-         }
-
-         return 0;
-      });
-   }
-
-   var latest = customSort ? tags[0] : tags.filter(function (tag) { return tag.indexOf('.') >= 0; }).pop();
-
-   return new TagList(tags, latest);
-};
-
-
-/***/ }),
-
-/***/ 20:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-module.exports = {
-   BranchDeleteSummary: __webpack_require__(480),
-   BranchSummary: __webpack_require__(753),
-   CommitSummary: __webpack_require__(900),
-   DiffSummary: __webpack_require__(785),
-   FetchSummary: __webpack_require__(131),
-   FileStatusSummary: __webpack_require__(591),
-   ListLogSummary: __webpack_require__(225),
-   MergeSummary: __webpack_require__(662),
-   MoveSummary: __webpack_require__(82),
-   PullSummary: __webpack_require__(186),
-   StatusSummary: __webpack_require__(298),
-   TagList: __webpack_require__(14),
-};
-
-
-/***/ }),
-
-/***/ 36:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var _a;
-Object.defineProperty(exports, "__esModule", { value: true });
-const assert_1 = __webpack_require__(357);
-const fs = __webpack_require__(747);
-const path = __webpack_require__(622);
-_a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
-exports.IS_WINDOWS = process.platform === 'win32';
-function exists(fsPath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield exports.stat(fsPath);
-        }
-        catch (err) {
-            if (err.code === 'ENOENT') {
-                return false;
-            }
-            throw err;
-        }
-        return true;
-    });
-}
-exports.exists = exists;
-function isDirectory(fsPath, useStat = false) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const stats = useStat ? yield exports.stat(fsPath) : yield exports.lstat(fsPath);
-        return stats.isDirectory();
-    });
-}
-exports.isDirectory = isDirectory;
-/**
- * On OSX/Linux, true if path starts with '/'. On Windows, true for paths like:
- * \, \hello, \\hello\share, C:, and C:\hello (and corresponding alternate separator cases).
- */
-function isRooted(p) {
-    p = normalizeSeparators(p);
-    if (!p) {
-        throw new Error('isRooted() parameter "p" cannot be empty');
-    }
-    if (exports.IS_WINDOWS) {
-        return (p.startsWith('\\') || /^[A-Z]:/i.test(p) // e.g. \ or \hello or \\hello
-        ); // e.g. C: or C:\hello
-    }
-    return p.startsWith('/');
-}
-exports.isRooted = isRooted;
-/**
- * Recursively create a directory at `fsPath`.
- *
- * This implementation is optimistic, meaning it attempts to create the full
- * path first, and backs up the path stack from there.
- *
- * @param fsPath The path to create
- * @param maxDepth The maximum recursion depth
- * @param depth The current recursion depth
- */
-function mkdirP(fsPath, maxDepth = 1000, depth = 1) {
-    return __awaiter(this, void 0, void 0, function* () {
-        assert_1.ok(fsPath, 'a path argument must be provided');
-        fsPath = path.resolve(fsPath);
-        if (depth >= maxDepth)
-            return exports.mkdir(fsPath);
-        try {
-            yield exports.mkdir(fsPath);
-            return;
-        }
-        catch (err) {
-            switch (err.code) {
-                case 'ENOENT': {
-                    yield mkdirP(path.dirname(fsPath), maxDepth, depth + 1);
-                    yield exports.mkdir(fsPath);
-                    return;
-                }
-                default: {
-                    let stats;
-                    try {
-                        stats = yield exports.stat(fsPath);
-                    }
-                    catch (err2) {
-                        throw err;
-                    }
-                    if (!stats.isDirectory())
-                        throw err;
-                }
-            }
-        }
-    });
-}
-exports.mkdirP = mkdirP;
-/**
- * Best effort attempt to determine whether a file exists and is executable.
- * @param filePath    file path to check
- * @param extensions  additional file extensions to try
- * @return if file exists and is executable, returns the file path. otherwise empty string.
- */
-function tryGetExecutablePath(filePath, extensions) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let stats = undefined;
-        try {
-            // test file exists
-            stats = yield exports.stat(filePath);
-        }
-        catch (err) {
-            if (err.code !== 'ENOENT') {
-                // eslint-disable-next-line no-console
-                console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
-            }
-        }
-        if (stats && stats.isFile()) {
-            if (exports.IS_WINDOWS) {
-                // on Windows, test for valid extension
-                const upperExt = path.extname(filePath).toUpperCase();
-                if (extensions.some(validExt => validExt.toUpperCase() === upperExt)) {
-                    return filePath;
-                }
-            }
-            else {
-                if (isUnixExecutable(stats)) {
-                    return filePath;
-                }
-            }
-        }
-        // try each extension
-        const originalFilePath = filePath;
-        for (const extension of extensions) {
-            filePath = originalFilePath + extension;
-            stats = undefined;
-            try {
-                stats = yield exports.stat(filePath);
-            }
-            catch (err) {
-                if (err.code !== 'ENOENT') {
-                    // eslint-disable-next-line no-console
-                    console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
-                }
-            }
-            if (stats && stats.isFile()) {
-                if (exports.IS_WINDOWS) {
-                    // preserve the case of the actual file (since an extension was appended)
-                    try {
-                        const directory = path.dirname(filePath);
-                        const upperName = path.basename(filePath).toUpperCase();
-                        for (const actualName of yield exports.readdir(directory)) {
-                            if (upperName === actualName.toUpperCase()) {
-                                filePath = path.join(directory, actualName);
-                                break;
-                            }
-                        }
-                    }
-                    catch (err) {
-                        // eslint-disable-next-line no-console
-                        console.log(`Unexpected error attempting to determine the actual case of the file '${filePath}': ${err}`);
-                    }
-                    return filePath;
-                }
-                else {
-                    if (isUnixExecutable(stats)) {
-                        return filePath;
-                    }
-                }
-            }
-        }
-        return '';
-    });
-}
-exports.tryGetExecutablePath = tryGetExecutablePath;
-function normalizeSeparators(p) {
-    p = p || '';
-    if (exports.IS_WINDOWS) {
-        // convert slashes on Windows
-        p = p.replace(/\//g, '\\');
-        // remove redundant slashes
-        return p.replace(/\\\\+/g, '\\');
-    }
-    // remove redundant slashes
-    return p.replace(/\/\/+/g, '/');
-}
-// on Mac/Linux, test the execute bit
-//     R   W  X  R  W X R W X
-//   256 128 64 32 16 8 4 2 1
-function isUnixExecutable(stats) {
-    return ((stats.mode & 1) > 0 ||
-        ((stats.mode & 8) > 0 && stats.gid === process.getgid()) ||
-        ((stats.mode & 64) > 0 && stats.uid === process.getuid()));
-}
-//# sourceMappingURL=io-util.js.map
-
-/***/ }),
-
-/***/ 82:
-/***/ (function(module) {
-
-
-module.exports = MoveSummary;
-
-/**
- * The MoveSummary is returned as a response to getting `git().status()`
- *
- * @constructor
- */
-function MoveSummary () {
-   this.moves = [];
-   this.sources = {};
-}
-
-MoveSummary.SUMMARY_REGEX = /^Renaming (.+) to (.+)$/;
-
-MoveSummary.parse = function (text) {
-   var lines = text.split('\n');
-   var summary = new MoveSummary();
-
-   for (var i = 0, iMax = lines.length, line; i < iMax; i++) {
-      line = MoveSummary.SUMMARY_REGEX.exec(lines[i].trim());
-
-      if (line) {
-         summary.moves.push({
-            from: line[1],
-            to: line[2]
-         });
-      }
-   }
-
-   return summary;
-};
-
-
-/***/ }),
-
-/***/ 87:
-/***/ (function(module) {
-
-module.exports = require("os");
-
-/***/ }),
-
-/***/ 105:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-if (typeof Promise === 'undefined') {
-   throw new ReferenceError("Promise wrappers must be enabled to use the promise API");
-}
-
-function isAsyncCall (fn) {
-   return /^[^)]+then\s*\)/.test(fn) || /\._run\(/.test(fn);
-}
-
-module.exports = function (baseDir) {
-
-   var Git = __webpack_require__(683);
-   var gitFactory = __webpack_require__(164);
-   var git;
-
-
-   var chain = Promise.resolve();
-
-   try {
-      git = gitFactory(baseDir);
-   }
-   catch (e) {
-      chain = Promise.reject(e);
-   }
-
-   return Object.keys(Git.prototype).reduce(function (promiseApi, fn) {
-      if (/^_|then/.test(fn)) {
-         return promiseApi;
-      }
-
-      if (isAsyncCall(Git.prototype[fn])) {
-         promiseApi[fn] = git ? asyncWrapper(fn, git) : function () {
-            return chain;
-         };
-      }
-
-      else {
-         promiseApi[fn] = git ? syncWrapper(fn, git, promiseApi) : function () {
-            return promiseApi;
-         };
-      }
-
-      return promiseApi;
-
-   }, {});
-
-   function asyncWrapper (fn, git) {
-      return function () {
-         var args = [].slice.call(arguments);
-
-         if (typeof args[args.length] === 'function') {
-            throw new TypeError(
-               "Promise interface requires that handlers are not supplied inline, " +
-               "trailing function not allowed in call to " + fn);
-         }
-
-         return chain.then(function () {
-            return new Promise(function (resolve, reject) {
-               args.push(function (err, result) {
-                  if (err) {
-                     return reject(toError(err));
-                  }
-
-                  resolve(result);
-               });
-
-               git[fn].apply(git, args);
-            });
-         });
-      };
-   }
-
-   function syncWrapper (fn, git, api) {
-      return function () {
-         git[fn].apply(git, arguments);
-
-         return api;
-      };
-   }
-
-};
-
-function toError (error) {
-
-   if (error instanceof Error) {
-      return error;
-   }
-
-   if (typeof error === 'string') {
-      return new Error(error);
-   }
-
-   return Object.create(new Error(error), {
-      git: { value: error },
-   });
-}
-
-
-/***/ }),
-
-/***/ 129:
-/***/ (function(module) {
-
-module.exports = require("child_process");
-
-/***/ }),
-
-/***/ 131:
-/***/ (function(module) {
-
-"use strict";
-
-
-function FetchSummary (raw) {
-   this.raw = raw;
-
-   this.remote = null;
-   this.branches = [];
-   this.tags = [];
-}
-
-FetchSummary.parsers = [
-   [
-      /From (.+)$/, function (fetchSummary, matches) {
-         fetchSummary.remote = matches[0];
-      }
-   ],
-   [
-      /\* \[new branch\]\s+(\S+)\s*\-> (.+)$/, function (fetchSummary, matches) {
-         fetchSummary.branches.push({
-            name: matches[0],
-            tracking: matches[1]
-         });
-      }
-   ],
-   [
-      /\* \[new tag\]\s+(\S+)\s*\-> (.+)$/, function (fetchSummary, matches) {
-         fetchSummary.tags.push({
-            name: matches[0],
-            tracking: matches[1]
-         });
-      }
-   ]
-];
-
-FetchSummary.parse = function (data) {
-   var fetchSummary = new FetchSummary(data);
-
-   String(data)
-      .trim()
-      .split('\n')
-      .forEach(function (line) {
-         var original = line.trim();
-         FetchSummary.parsers.some(function (parser) {
-            var parsed = parser[0].exec(original);
-            if (parsed) {
-               parser[1](fetchSummary, parsed.slice(1));
-               return true;
-            }
-         });
-      });
-
-   return fetchSummary;
-};
-
-module.exports = FetchSummary;
-
-
-/***/ }),
-
-/***/ 164:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-var Git = __webpack_require__(683);
-
-module.exports = function (baseDir) {
-
-   var dependencies = __webpack_require__(2);
-
-   if (baseDir && !dependencies.exists(baseDir, dependencies.exists.FOLDER)) {
-       throw new Error("Cannot use simple-git on a directory that does not exist.");
-    }
-
-    return new Git(baseDir || process.cwd(), dependencies.childProcess(), dependencies.buffer());
-};
-
-
-
-/***/ }),
-
-/***/ 186:
-/***/ (function(module) {
-
-
-module.exports = PullSummary;
-
-/**
- * The PullSummary is returned as a response to getting `git().pull()`
- *
- * @constructor
- */
-function PullSummary () {
-   this.files = [];
-   this.insertions = {};
-   this.deletions = {};
-
-   this.summary = {
-      changes: 0,
-      insertions: 0,
-      deletions: 0
-   };
-
-   this.created = [];
-   this.deleted = [];
-}
-
-/**
- * Array of files that were created
- * @type {string[]}
- */
-PullSummary.prototype.created = null;
-
-/**
- * Array of files that were deleted
- * @type {string[]}
- */
-PullSummary.prototype.deleted = null;
-
-/**
- * The array of file paths/names that have been modified in any part of the pulled content
- * @type {string[]}
- */
-PullSummary.prototype.files = null;
-
-/**
- * A map of file path to number to show the number of insertions per file.
- * @type {Object}
- */
-PullSummary.prototype.insertions = null;
-
-/**
- * A map of file path to number to show the number of deletions per file.
- * @type {Object}
- */
-PullSummary.prototype.deletions = null;
-
-/**
- * Overall summary of changes/insertions/deletions and the number associated with each
- * across all content that was pulled.
- * @type {Object}
- */
-PullSummary.prototype.summary = null;
-
-PullSummary.FILE_UPDATE_REGEX = /^\s*(.+?)\s+\|\s+\d+\s*(\+*)(-*)/;
-PullSummary.SUMMARY_REGEX = /(\d+)\D+((\d+)\D+\(\+\))?(\D+(\d+)\D+\(-\))?/;
-PullSummary.ACTION_REGEX = /(create|delete) mode \d+ (.+)/;
-
-PullSummary.parse = function (text) {
-   var pullSummary = new PullSummary;
-   var lines = text.split('\n');
-
-   while (lines.length) {
-      var line = lines.shift().trim();
-      if (!line) {
-         continue;
-      }
-
-      update(pullSummary, line) || summary(pullSummary, line) || action(pullSummary, line);
-   }
-
-   return pullSummary;
-};
-
-function update (pullSummary, line) {
-
-   var update = PullSummary.FILE_UPDATE_REGEX.exec(line);
-   if (!update) {
-      return false;
-   }
-
-   pullSummary.files.push(update[1]);
-
-   var insertions = update[2].length;
-   if (insertions) {
-      pullSummary.insertions[update[1]] = insertions;
-   }
-
-   var deletions = update[3].length;
-   if (deletions) {
-      pullSummary.deletions[update[1]] = deletions;
-   }
-
-   return true;
-}
-
-function summary (pullSummary, line) {
-   if (!pullSummary.files.length) {
-      return false;
-   }
-
-   var update = PullSummary.SUMMARY_REGEX.exec(line);
-   if (!update || (update[3] === undefined && update[5] === undefined)) {
-      return false;
-   }
-
-   pullSummary.summary.changes = +update[1] || 0;
-   pullSummary.summary.insertions = +update[3] || 0;
-   pullSummary.summary.deletions = +update[5] || 0;
-
-   return true;
-}
-
-function action (pullSummary, line) {
-
-   var match = PullSummary.ACTION_REGEX.exec(line);
-   if (!match) {
-      return false;
-   }
-
-   var file = match[2];
-
-   if (pullSummary.files.indexOf(file) < 0) {
-      pullSummary.files.push(file);
-   }
-
-   var container = (match[1] === 'create') ? pullSummary.created : pullSummary.deleted;
-   container.push(file);
-
-   return true;
-}
-
-
-/***/ }),
-
-/***/ 225:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-module.exports = ListLogSummary;
-
-var DiffSummary = __webpack_require__(785);
-
-/**
- * The ListLogSummary is returned as a response to getting `git().log()` or `git().stashList()`
- *
- * @constructor
- */
-function ListLogSummary (all) {
-   this.all = all;
-   this.latest = all.length && all[0] || null;
-   this.total = all.length;
-}
-
-/**
- * Detail for each of the log lines
- * @type {ListLogLine[]}
- */
-ListLogSummary.prototype.all = null;
-
-/**
- * Most recent entry in the log
- * @type {ListLogLine}
- */
-ListLogSummary.prototype.latest = null;
-
-/**
- * Number of items in the log
- * @type {number}
- */
-ListLogSummary.prototype.total = 0;
-
-function ListLogLine (line, fields) {
-   for (var k = 0; k < fields.length; k++) {
-      this[fields[k]] = line[k] || '';
-   }
-}
-
-/**
- * When the log was generated with a summary, the `diff` property contains as much detail
- * as was provided in the log (whether generated with `--stat` or `--shortstat`.
- * @type {DiffSummary}
- */
-ListLogLine.prototype.diff = null;
-
-ListLogSummary.START_BOUNDARY = 'òòòòòò ';
-
-ListLogSummary.COMMIT_BOUNDARY = ' òò';
-
-ListLogSummary.SPLITTER = ' ò ';
-
-ListLogSummary.parse = function (text, splitter, fields) {
-   fields = fields || ['hash', 'date', 'message', 'refs', 'author_name', 'author_email'];
-   return new ListLogSummary(
-      text
-         .trim()
-         .split(ListLogSummary.START_BOUNDARY)
-         .filter(function(item) { return !!item.trim(); })
-         .map(function (item) {
-            var lineDetail = item.trim().split(ListLogSummary.COMMIT_BOUNDARY);
-            var listLogLine = new ListLogLine(lineDetail[0].trim().split(splitter), fields);
-
-            if (lineDetail.length > 1 && !!lineDetail[1].trim()) {
-               listLogLine.diff = DiffSummary.parse(lineDetail[1]);
-            }
-
-            return listLogLine;
-         })
-   );
-};
-
-
-/***/ }),
-
-/***/ 293:
-/***/ (function(module) {
-
-module.exports = require("buffer");
-
-/***/ }),
-
-/***/ 298:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-
-
-var FileStatusSummary = __webpack_require__(591);
-
-module.exports = StatusSummary;
-
-/**
- * The StatusSummary is returned as a response to getting `git().status()`
- *
- * @constructor
- */
-function StatusSummary () {
-   this.not_added = [];
-   this.conflicted = [];
-   this.created = [];
-   this.deleted = [];
-   this.modified = [];
-   this.renamed = [];
-   this.files = [];
-   this.staged = [];
-}
-
-
-/**
- * Number of commits ahead of the tracked branch
- * @type {number}
- */
-StatusSummary.prototype.ahead = 0;
-
-/**
- * Number of commits behind the tracked branch
- * @type {number}
- */
-StatusSummary.prototype.behind = 0;
-
-/**
- * Name of the current branch
- * @type {null}
- */
-StatusSummary.prototype.current = null;
-
-/**
- * Name of the branch being tracked
- * @type {string}
- */
-StatusSummary.prototype.tracking = null;
-
-/**
- * All files represented as an array of objects containing the `path` and status in `index` and
- * in the `working_dir`.
- *
- * @type {Array}
- */
-StatusSummary.prototype.files = null;
-
-/**
- * Gets whether this StatusSummary represents a clean working branch.
- *
- * @return {boolean}
- */
-StatusSummary.prototype.isClean = function () {
-   return 0 === Object.keys(this).filter(function (name) {
-      return Array.isArray(this[name]) && this[name].length;
-   }, this).length;
-};
-
-StatusSummary.parsers = {
-   '##': function (line, status) {
-      var aheadReg = /ahead (\d+)/;
-      var behindReg = /behind (\d+)/;
-      var currentReg = /^(.+?(?=(?:\.{3}|\s|$)))/;
-      var trackingReg = /\.{3}(\S*)/;
-      var regexResult;
-
-      regexResult = aheadReg.exec(line);
-      status.ahead = regexResult && +regexResult[1] || 0;
-
-      regexResult = behindReg.exec(line);
-      status.behind = regexResult && +regexResult[1] || 0;
-
-      regexResult = currentReg.exec(line);
-      status.current = regexResult && regexResult[1];
-
-      regexResult = trackingReg.exec(line);
-      status.tracking = regexResult && regexResult[1];
-   },
-
-   '??': function (line, status) {
-      status.not_added.push(line);
-   },
-
-   A: function (line, status) {
-      status.created.push(line);
-   },
-
-   AM: function (line, status) {
-      status.created.push(line);
-   },
-
-   D: function (line, status) {
-      status.deleted.push(line);
-   },
-
-   M: function (line, status, indexState) {
-      status.modified.push(line);
-
-      if (indexState === 'M') {
-         status.staged.push(line);
-      }
-   },
-
-   R: function (line, status) {
-      var detail = /^(.+) -> (.+)$/.exec(line) || [null, line, line];
-
-      status.renamed.push({
-         from: detail[1],
-         to: detail[2]
-      });
-   },
-
-   UU: function (line, status) {
-      status.conflicted.push(line);
-   }
-};
-
-StatusSummary.parsers.MM = StatusSummary.parsers.M;
-
-/* Map all unmerged status code combinations to UU to mark as conflicted */
-StatusSummary.parsers.AA = StatusSummary.parsers.UU;
-StatusSummary.parsers.UD = StatusSummary.parsers.UU;
-StatusSummary.parsers.DU = StatusSummary.parsers.UU;
-StatusSummary.parsers.DD = StatusSummary.parsers.UU;
-StatusSummary.parsers.AU = StatusSummary.parsers.UU;
-StatusSummary.parsers.UA = StatusSummary.parsers.UU;
-
-StatusSummary.parse = function (text) {
-   var file;
-   var lines = text.trim().split('\n');
-   var status = new StatusSummary();
-
-   for (var i = 0, l = lines.length; i < l; i++) {
-      file = splitLine(lines[i]);
-
-      if (!file) {
-         continue;
-      }
-
-      if (file.handler) {
-         file.handler(file.path, status, file.index, file.workingDir);
-      }
-
-      if (file.code !== '##') {
-         status.files.push(new FileStatusSummary(file.path, file.index, file.workingDir));
-      }
-   }
-
-   return status;
-};
-
-
-function splitLine (lineStr) {
-   var line = lineStr.trim().match(/(..?)(\s+)(.*)/);
-   if (!line || !line[1].trim()) {
-      line = lineStr.trim().match(/(..?)\s+(.*)/);
-   }
-
-   if (!line) {
-      return;
-   }
-
-   var code = line[1];
-   if (line[2].length > 1) {
-      code += ' ';
-   }
-   if (code.length === 1 && line[2].length === 1) {
-      code = ' ' + code;
-   }
-
-   return {
-      raw: code,
-      code: code.trim(),
-      index: code.charAt(0),
-      workingDir: code.charAt(1),
-      handler: StatusSummary.parsers[code.trim()],
-      path: line[3]
-   };
-}
-
-
-/***/ }),
-
-/***/ 357:
-/***/ (function(module) {
-
-module.exports = require("assert");
-
-/***/ }),
-
-/***/ 374:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- */
-
-function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(793);
-
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
-
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
-
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
-
-	createDebug.names = [];
-	createDebug.skips = [];
-
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
-
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
-
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
-
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
-
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
-
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
-
-			const self = debug;
-
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
-
-			args[0] = createDebug.coerce(args[0]);
-
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
-
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
-
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
-
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
-
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
-
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = createDebug.selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-
-		// Env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
-
-		createDebug.instances.push(debug);
-
-		return debug;
-	}
-
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
-
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
-
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
-
-		createDebug.names = [];
-		createDebug.skips = [];
-
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
-
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
-
-			namespaces = split[i].replace(/\*/g, '.*?');
-
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
-
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
-
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
-
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
-
-		let i;
-		let len;
-
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
-
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
-
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
-
-	createDebug.enable(createDebug.load());
-
-	return createDebug;
-}
-
-module.exports = setup;
-
-
-/***/ }),
-
-/***/ 375:
-/***/ (function(module) {
-
-
-module.exports = function deferred () {
-   var d = {};
-   d.promise = new Promise(function (resolve, reject) {
-      d.resolve = resolve;
-      d.reject = reject
-   });
-
-   return d;
-};
-
-
-/***/ }),
-
-/***/ 394:
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Module dependencies.
- */
-
-const tty = __webpack_require__(867);
-const util = __webpack_require__(669);
-
-/**
- * This is the Node.js implementation of `debug()`.
- */
-
-exports.init = init;
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-
-/**
- * Colors.
- */
-
-exports.colors = [6, 2, 3, 4, 5, 1];
-
-try {
-	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
-	// eslint-disable-next-line import/no-extraneous-dependencies
-	const supportsColor = __webpack_require__(909);
-
-	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
-		exports.colors = [
-			20,
-			21,
-			26,
-			27,
-			32,
-			33,
-			38,
-			39,
-			40,
-			41,
-			42,
-			43,
-			44,
-			45,
-			56,
-			57,
-			62,
-			63,
-			68,
-			69,
-			74,
-			75,
-			76,
-			77,
-			78,
-			79,
-			80,
-			81,
-			92,
-			93,
-			98,
-			99,
-			112,
-			113,
-			128,
-			129,
-			134,
-			135,
-			148,
-			149,
-			160,
-			161,
-			162,
-			163,
-			164,
-			165,
-			166,
-			167,
-			168,
-			169,
-			170,
-			171,
-			172,
-			173,
-			178,
-			179,
-			184,
-			185,
-			196,
-			197,
-			198,
-			199,
-			200,
-			201,
-			202,
-			203,
-			204,
-			205,
-			206,
-			207,
-			208,
-			209,
-			214,
-			215,
-			220,
-			221
-		];
-	}
-} catch (error) {
-	// Swallow - we only care if `supports-color` is available; it doesn't have to be.
-}
-
-/**
- * Build up the default `inspectOpts` object from the environment variables.
- *
- *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
- */
-
-exports.inspectOpts = Object.keys(process.env).filter(key => {
-	return /^debug_/i.test(key);
-}).reduce((obj, key) => {
-	// Camel-case
-	const prop = key
-		.substring(6)
-		.toLowerCase()
-		.replace(/_([a-z])/g, (_, k) => {
-			return k.toUpperCase();
-		});
-
-	// Coerce string value into JS value
-	let val = process.env[key];
-	if (/^(yes|on|true|enabled)$/i.test(val)) {
-		val = true;
-	} else if (/^(no|off|false|disabled)$/i.test(val)) {
-		val = false;
-	} else if (val === 'null') {
-		val = null;
-	} else {
-		val = Number(val);
-	}
-
-	obj[prop] = val;
-	return obj;
-}, {});
-
-/**
- * Is stdout a TTY? Colored output is enabled when `true`.
- */
-
-function useColors() {
-	return 'colors' in exports.inspectOpts ?
-		Boolean(exports.inspectOpts.colors) :
-		tty.isatty(process.stderr.fd);
-}
-
-/**
- * Adds ANSI color escape codes if enabled.
- *
- * @api public
- */
-
-function formatArgs(args) {
-	const {namespace: name, useColors} = this;
-
-	if (useColors) {
-		const c = this.color;
-		const colorCode = '\u001B[3' + (c < 8 ? c : '8;5;' + c);
-		const prefix = `  ${colorCode};1m${name} \u001B[0m`;
-
-		args[0] = prefix + args[0].split('\n').join('\n' + prefix);
-		args.push(colorCode + 'm+' + module.exports.humanize(this.diff) + '\u001B[0m');
-	} else {
-		args[0] = getDate() + name + ' ' + args[0];
-	}
-}
-
-function getDate() {
-	if (exports.inspectOpts.hideDate) {
-		return '';
-	}
-	return new Date().toISOString() + ' ';
-}
-
-/**
- * Invokes `util.format()` with the specified arguments and writes to stderr.
- */
-
-function log(...args) {
-	return process.stderr.write(util.format(...args) + '\n');
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-function save(namespaces) {
-	if (namespaces) {
-		process.env.DEBUG = namespaces;
-	} else {
-		// If you set a process.env field to null or undefined, it gets cast to the
-		// string 'null' or 'undefined'. Just delete instead.
-		delete process.env.DEBUG;
-	}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-	return process.env.DEBUG;
-}
-
-/**
- * Init logic for `debug` instances.
- *
- * Create a new `inspectOpts` object in case `useColors` is set
- * differently for a particular `debug` instance.
- */
-
-function init(debug) {
-	debug.inspectOpts = {};
-
-	const keys = Object.keys(exports.inspectOpts);
-	for (let i = 0; i < keys.length; i++) {
-		debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
-	}
-}
-
-module.exports = __webpack_require__(374)(exports);
-
-const {formatters} = module.exports;
-
-/**
- * Map %o to `util.inspect()`, all on a single line.
- */
-
-formatters.o = function (v) {
-	this.inspectOpts.colors = this.useColors;
-	return util.inspect(v, this.inspectOpts)
-		.replace(/\s*\n\s*/g, ' ');
-};
-
-/**
- * Map %O to `util.inspect()`, allowing multiple lines if needed.
- */
-
-formatters.O = function (v) {
-	this.inspectOpts.colors = this.useColors;
-	return util.inspect(v, this.inspectOpts);
-};
-
-
-/***/ }),
-
-/***/ 422:
-/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
-
-const core = __webpack_require__(488);
-const exec = __webpack_require__(724);
-const git = __webpack_require__(105)();
-const fs = __webpack_require__(747);
-
-(async () => {
-    try {
-
-        // Fail fast, we can only handle pushes to branches
-        if (!process.env.GITHUB_REF || !process.env.GITHUB_REF.match(/^refs\/heads\//)) {
-            throw new Exception("No branch given via process.env.GITHUB_REF");
-        }
-
-        // Define some parameters
-        let name = core.getInput('name');
-        if (name == "") {
-            name = process.env.GITHUB_REPOSITORY;
-        }
-        if (core.getInput('registry') == 'acr') {
-            name = process.env.ACR_LOGIN + '/' + name.substring('leanix/'.length)
-        }
-        if (core.getInput('registry') == 'acr-public') {
-            name = process.env.ACR_PUBLIC_LOGIN + '/' + name.substring('leanix/'.length)
-        }
-        const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
-        const normalisedBranch = branch.replace(/\W+/g, '-');
-        const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
-        const currentCommit = process.env.GITHUB_SHA;
-        let latestTag = normalisedBranch + "-latest";
-        if (["master", "main"].includes(normalisedBranch)) {
-            latestTag = "latest";
-        }
-        const nameWithLatestTag = name + ":" + latestTag;
-        let currentVersion=0;
-        let taggedCommit;
-        let nextVersion;
-        let path = core.getInput('path');
-        let onlyOutputTags = core.getInput('only-output-tags') == 'true'
-        let dockerfile = core.getInput('dockerfile');
-
-        // Parameters for caching
-        let enableCache = core.getInput('enable-cache') == 'true';
-
-
-        // Fetch tags and look for existing one matching the current versionTagPrefix
-        await git.fetch(['--tags']);
-        const tagsOfCurrentCommitString = await git.tag(
-            [
-                '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
-                '--points-at', currentCommit, // ...and that point at our current commit...
-                '--sort', '-v:refname' // ...and sort them in reverse in case there is more than one
-            ]
-        );
-
-        if (tagsOfCurrentCommitString.length > 0) {
-            // If the commit is already tagged, we use that tag
-            const tagsOfCurrentCommit = tagsOfCurrentCommitString.split('\n');
-            currentVersion=parseInt(tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
-            taggedCommit = currentCommit;
-        } else {
-            // Otherwise we determine the latest version tag such that we can create a new tag with an incremented version number
-            const tagsString = await git.tag(
-                [
-                    '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
-                    '--sort', '-v:refname' // ...and sort them in reverse
-                ]
-            );
-            // If we found one, use it to update the current version and set the tagged commit
-            if (tagsString.length > 0) {
-                const tags = tagsString.split('\n');
-                currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
-                taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
-            }
-        }
-
-        // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
-        if (taggedCommit == currentCommit) {
-            core.info("Current commit is already tagged with version " + currentVersion);
-            nextVersion = currentVersion;
-        } else {
-            nextVersion = currentVersion + 1;
-            core.info("Next version on branch " + branch + " is " + nextVersion);
-            await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
-            await git.pushTags();
-        }
-        const versionTag = normalisedBranch + "-" + nextVersion
-        const nameWithVersion = name + ":" + versionTag;
-
-        if (!onlyOutputTags) {
-            // Configure docker
-            let auths = {
-                "https://index.docker.io/v1/": {
-                    auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
-                }
-            }
-            auths[process.env.ACR_LOGIN] = {
-                auth: Buffer.from(process.env.ACR_USERNAME + ':' + process.env.ACR_PASSWORD).toString('base64')
-            }
-            auths[process.env.ACR_PUBLIC_LOGIN] = {
-                auth: Buffer.from(process.env.ACR_PUBLIC_USERNAME + ':' + process.env.ACR_PUBLIC_PASSWORD).toString('base64')
-            }
-
-            const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
-            fs.mkdirSync(dockerConfigDirectory);
-            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({auths: auths}));
-            core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
-
-            // Now build the docker image tagged with the correct version and push it
-            const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
-            core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
-            dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
-            if (enableCache) {
-                const nameWithCurrentVersion = name + ":" + normalisedBranch + "-" + currentVersion;
-                const cachingArgs = ["--cache-from", "type=registry,ref=" + nameWithCurrentVersion, "--cache-to", "type=inline"];
-                await exec.exec('docker', ['buildx', 'build', ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
-            }
-            else {
-                await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
-
-            }
-            await exec.exec('docker', ['push', nameWithVersion], options);
-            // Also push a "latest" tag
-            await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
-            await exec.exec('docker', ['push', nameWithLatestTag], options);
-        }
-
-        core.setOutput('tag', versionTag);
-        core.setOutput('latest_tag', latestTag);
-        core.setOutput('git_tag', versionTagPrefix + nextVersion);
-    } catch (e) {
-        core.setFailed(e.message);
-    }
-})();
-
-
-/***/ }),
-
-/***/ 471:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-// For internal use, subject to change.
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-// We use any as a valid input type
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__webpack_require__(747));
-const os = __importStar(__webpack_require__(87));
-const utils_1 = __webpack_require__(830);
-function issueCommand(command, message) {
-    const filePath = process.env[`GITHUB_${command}`];
-    if (!filePath) {
-        throw new Error(`Unable to find environment variable for file command ${command}`);
-    }
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`Missing file at path: ${filePath}`);
-    }
-    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
-        encoding: 'utf8'
-    });
-}
-exports.issueCommand = issueCommand;
-//# sourceMappingURL=file-command.js.map
-
-/***/ }),
-
-/***/ 480:
-/***/ (function(module) {
-
-
-module.exports = BranchDeletion;
-
-function BranchDeletion (branch, hash) {
-   this.branch = branch;
-   this.hash = hash;
-   this.success = hash !== null;
-}
-
-BranchDeletion.deleteSuccessRegex = /(\S+)\s+\(\S+\s([^\)]+)\)/;
-BranchDeletion.deleteErrorRegex = /^error[^']+'([^']+)'/;
-
-BranchDeletion.parse = function (data, asArray) {
-   var result;
-   var branchDeletions = data.trim().split('\n').map(function (line) {
-         if (result = BranchDeletion.deleteSuccessRegex.exec(line)) {
-            return new BranchDeletion(result[1], result[2]);
-         }
-         else if (result = BranchDeletion.deleteErrorRegex.exec(line)) {
-            return new BranchDeletion(result[1], null);
-         }
-      })
-      .filter(Boolean);
-
-   return asArray ? branchDeletions : branchDeletions.pop();
-};
-
-
-/***/ }),
-
-/***/ 488:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const command_1 = __webpack_require__(7);
-const file_command_1 = __webpack_require__(471);
-const utils_1 = __webpack_require__(830);
-const os = __importStar(__webpack_require__(87));
-const path = __importStar(__webpack_require__(622));
-/**
- * The code to exit an action
- */
-var ExitCode;
-(function (ExitCode) {
-    /**
-     * A code indicating that the action was successful
-     */
-    ExitCode[ExitCode["Success"] = 0] = "Success";
-    /**
-     * A code indicating that the action was a failure
-     */
-    ExitCode[ExitCode["Failure"] = 1] = "Failure";
-})(ExitCode = exports.ExitCode || (exports.ExitCode = {}));
-//-----------------------------------------------------------------------
-// Variables
-//-----------------------------------------------------------------------
-/**
- * Sets env variable for this action and future actions in the job
- * @param name the name of the variable to set
- * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function exportVariable(name, val) {
-    const convertedVal = utils_1.toCommandValue(val);
-    process.env[name] = convertedVal;
-    const filePath = process.env['GITHUB_ENV'] || '';
-    if (filePath) {
-        const delimiter = '_GitHubActionsFileCommandDelimeter_';
-        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
-        file_command_1.issueCommand('ENV', commandValue);
-    }
-    else {
-        command_1.issueCommand('set-env', { name }, convertedVal);
-    }
-}
-exports.exportVariable = exportVariable;
-/**
- * Registers a secret which will get masked from logs
- * @param secret value of the secret
- */
-function setSecret(secret) {
-    command_1.issueCommand('add-mask', {}, secret);
-}
-exports.setSecret = setSecret;
-/**
- * Prepends inputPath to the PATH (for this action and future actions)
- * @param inputPath
- */
-function addPath(inputPath) {
-    const filePath = process.env['GITHUB_PATH'] || '';
-    if (filePath) {
-        file_command_1.issueCommand('PATH', inputPath);
-    }
-    else {
-        command_1.issueCommand('add-path', {}, inputPath);
-    }
-    process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
-}
-exports.addPath = addPath;
-/**
- * Gets the value of an input.  The value is also trimmed.
- *
- * @param     name     name of the input to get
- * @param     options  optional. See InputOptions.
- * @returns   string
- */
-function getInput(name, options) {
-    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
-    if (options && options.required && !val) {
-        throw new Error(`Input required and not supplied: ${name}`);
-    }
-    return val.trim();
-}
-exports.getInput = getInput;
-/**
- * Sets the value of an output.
- *
- * @param     name     name of the output to set
- * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function setOutput(name, value) {
-    command_1.issueCommand('set-output', { name }, value);
-}
-exports.setOutput = setOutput;
-/**
- * Enables or disables the echoing of commands into stdout for the rest of the step.
- * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
- *
- */
-function setCommandEcho(enabled) {
-    command_1.issue('echo', enabled ? 'on' : 'off');
-}
-exports.setCommandEcho = setCommandEcho;
-//-----------------------------------------------------------------------
-// Results
-//-----------------------------------------------------------------------
-/**
- * Sets the action status to failed.
- * When the action exits it will be with an exit code of 1
- * @param message add error issue message
- */
-function setFailed(message) {
-    process.exitCode = ExitCode.Failure;
-    error(message);
-}
-exports.setFailed = setFailed;
-//-----------------------------------------------------------------------
-// Logging Commands
-//-----------------------------------------------------------------------
-/**
- * Gets whether Actions Step Debug is on or not
- */
-function isDebug() {
-    return process.env['RUNNER_DEBUG'] === '1';
-}
-exports.isDebug = isDebug;
-/**
- * Writes debug message to user log
- * @param message debug message
- */
-function debug(message) {
-    command_1.issueCommand('debug', {}, message);
-}
-exports.debug = debug;
-/**
- * Adds an error issue
- * @param message error issue message. Errors will be converted to string via toString()
- */
-function error(message) {
-    command_1.issue('error', message instanceof Error ? message.toString() : message);
-}
-exports.error = error;
-/**
- * Adds an warning issue
- * @param message warning issue message. Errors will be converted to string via toString()
- */
-function warning(message) {
-    command_1.issue('warning', message instanceof Error ? message.toString() : message);
-}
-exports.warning = warning;
-/**
- * Writes info to log with console.log.
- * @param message info message
- */
-function info(message) {
-    process.stdout.write(message + os.EOL);
-}
-exports.info = info;
-/**
- * Begin an output group.
- *
- * Output until the next `groupEnd` will be foldable in this group
- *
- * @param name The name of the output group
- */
-function startGroup(name) {
-    command_1.issue('group', name);
-}
-exports.startGroup = startGroup;
-/**
- * End an output group.
- */
-function endGroup() {
-    command_1.issue('endgroup');
-}
-exports.endGroup = endGroup;
-/**
- * Wrap an asynchronous function call in a group.
- *
- * Returns the same type as the function itself.
- *
- * @param name The name of the group
- * @param fn The function to wrap in the group
- */
-function group(name, fn) {
-    return __awaiter(this, void 0, void 0, function* () {
-        startGroup(name);
-        let result;
-        try {
-            result = yield fn();
-        }
-        finally {
-            endGroup();
-        }
-        return result;
-    });
-}
-exports.group = group;
-//-----------------------------------------------------------------------
-// Wrapper action state
-//-----------------------------------------------------------------------
-/**
- * Saves state for current action, the state can only be retrieved by this action's post job execution.
- *
- * @param     name     name of the state to store
- * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function saveState(name, value) {
-    command_1.issueCommand('save-state', { name }, value);
-}
-exports.saveState = saveState;
-/**
- * Gets the value of an state set by this action's main execution.
- *
- * @param     name     name of the state to get
- * @returns   string
- */
-function getState(name) {
-    return process.env[`STATE_${name}`] || '';
-}
-exports.getState = getState;
-//# sourceMappingURL=core.js.map
-
-/***/ }),
-
-/***/ 591:
-/***/ (function(module) {
-
-"use strict";
-
-
-function FileStatusSummary (path, index, working_dir) {
-   this.path = path;
-   this.index = index;
-   this.working_dir = working_dir;
-
-   if ('R' === index + working_dir) {
-      var detail = FileStatusSummary.fromPathRegex.exec(path) || [null, path, path];
-      this.from = detail[1];
-      this.path = detail[2];
-   }
-}
-
-FileStatusSummary.fromPathRegex = /^(.+) -> (.+)$/;
-
-FileStatusSummary.prototype = {
-   path: '',
-   from: ''
-};
-
-module.exports = FileStatusSummary;
-
-
-/***/ }),
-
-/***/ 607:
+/***/ 18:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-env browser */
@@ -2390,7 +296,7 @@ function localstorage() {
 	}
 }
 
-module.exports = __webpack_require__(374)(exports);
+module.exports = __webpack_require__(830)(exports);
 
 const {formatters} = module.exports;
 
@@ -2409,14 +315,1502 @@ formatters.j = function (v) {
 
 /***/ }),
 
-/***/ 614:
-/***/ (function(module) {
+/***/ 26:
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-module.exports = require("events");
+/**
+ * Detect Electron renderer / nwjs process, which is node, but we should
+ * treat as a browser.
+ */
+
+if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
+	module.exports = __webpack_require__(18);
+} else {
+	module.exports = __webpack_require__(778);
+}
+
 
 /***/ }),
 
-/***/ 620:
+/***/ 47:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+const assert_1 = __webpack_require__(357);
+const fs = __webpack_require__(747);
+const path = __webpack_require__(622);
+_a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
+exports.IS_WINDOWS = process.platform === 'win32';
+function exists(fsPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield exports.stat(fsPath);
+        }
+        catch (err) {
+            if (err.code === 'ENOENT') {
+                return false;
+            }
+            throw err;
+        }
+        return true;
+    });
+}
+exports.exists = exists;
+function isDirectory(fsPath, useStat = false) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const stats = useStat ? yield exports.stat(fsPath) : yield exports.lstat(fsPath);
+        return stats.isDirectory();
+    });
+}
+exports.isDirectory = isDirectory;
+/**
+ * On OSX/Linux, true if path starts with '/'. On Windows, true for paths like:
+ * \, \hello, \\hello\share, C:, and C:\hello (and corresponding alternate separator cases).
+ */
+function isRooted(p) {
+    p = normalizeSeparators(p);
+    if (!p) {
+        throw new Error('isRooted() parameter "p" cannot be empty');
+    }
+    if (exports.IS_WINDOWS) {
+        return (p.startsWith('\\') || /^[A-Z]:/i.test(p) // e.g. \ or \hello or \\hello
+        ); // e.g. C: or C:\hello
+    }
+    return p.startsWith('/');
+}
+exports.isRooted = isRooted;
+/**
+ * Recursively create a directory at `fsPath`.
+ *
+ * This implementation is optimistic, meaning it attempts to create the full
+ * path first, and backs up the path stack from there.
+ *
+ * @param fsPath The path to create
+ * @param maxDepth The maximum recursion depth
+ * @param depth The current recursion depth
+ */
+function mkdirP(fsPath, maxDepth = 1000, depth = 1) {
+    return __awaiter(this, void 0, void 0, function* () {
+        assert_1.ok(fsPath, 'a path argument must be provided');
+        fsPath = path.resolve(fsPath);
+        if (depth >= maxDepth)
+            return exports.mkdir(fsPath);
+        try {
+            yield exports.mkdir(fsPath);
+            return;
+        }
+        catch (err) {
+            switch (err.code) {
+                case 'ENOENT': {
+                    yield mkdirP(path.dirname(fsPath), maxDepth, depth + 1);
+                    yield exports.mkdir(fsPath);
+                    return;
+                }
+                default: {
+                    let stats;
+                    try {
+                        stats = yield exports.stat(fsPath);
+                    }
+                    catch (err2) {
+                        throw err;
+                    }
+                    if (!stats.isDirectory())
+                        throw err;
+                }
+            }
+        }
+    });
+}
+exports.mkdirP = mkdirP;
+/**
+ * Best effort attempt to determine whether a file exists and is executable.
+ * @param filePath    file path to check
+ * @param extensions  additional file extensions to try
+ * @return if file exists and is executable, returns the file path. otherwise empty string.
+ */
+function tryGetExecutablePath(filePath, extensions) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let stats = undefined;
+        try {
+            // test file exists
+            stats = yield exports.stat(filePath);
+        }
+        catch (err) {
+            if (err.code !== 'ENOENT') {
+                // eslint-disable-next-line no-console
+                console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
+            }
+        }
+        if (stats && stats.isFile()) {
+            if (exports.IS_WINDOWS) {
+                // on Windows, test for valid extension
+                const upperExt = path.extname(filePath).toUpperCase();
+                if (extensions.some(validExt => validExt.toUpperCase() === upperExt)) {
+                    return filePath;
+                }
+            }
+            else {
+                if (isUnixExecutable(stats)) {
+                    return filePath;
+                }
+            }
+        }
+        // try each extension
+        const originalFilePath = filePath;
+        for (const extension of extensions) {
+            filePath = originalFilePath + extension;
+            stats = undefined;
+            try {
+                stats = yield exports.stat(filePath);
+            }
+            catch (err) {
+                if (err.code !== 'ENOENT') {
+                    // eslint-disable-next-line no-console
+                    console.log(`Unexpected error attempting to determine if executable file exists '${filePath}': ${err}`);
+                }
+            }
+            if (stats && stats.isFile()) {
+                if (exports.IS_WINDOWS) {
+                    // preserve the case of the actual file (since an extension was appended)
+                    try {
+                        const directory = path.dirname(filePath);
+                        const upperName = path.basename(filePath).toUpperCase();
+                        for (const actualName of yield exports.readdir(directory)) {
+                            if (upperName === actualName.toUpperCase()) {
+                                filePath = path.join(directory, actualName);
+                                break;
+                            }
+                        }
+                    }
+                    catch (err) {
+                        // eslint-disable-next-line no-console
+                        console.log(`Unexpected error attempting to determine the actual case of the file '${filePath}': ${err}`);
+                    }
+                    return filePath;
+                }
+                else {
+                    if (isUnixExecutable(stats)) {
+                        return filePath;
+                    }
+                }
+            }
+        }
+        return '';
+    });
+}
+exports.tryGetExecutablePath = tryGetExecutablePath;
+function normalizeSeparators(p) {
+    p = p || '';
+    if (exports.IS_WINDOWS) {
+        // convert slashes on Windows
+        p = p.replace(/\//g, '\\');
+        // remove redundant slashes
+        return p.replace(/\\\\+/g, '\\');
+    }
+    // remove redundant slashes
+    return p.replace(/\/\/+/g, '/');
+}
+// on Mac/Linux, test the execute bit
+//     R   W  X  R  W X R W X
+//   256 128 64 32 16 8 4 2 1
+function isUnixExecutable(stats) {
+    return ((stats.mode & 1) > 0 ||
+        ((stats.mode & 8) > 0 && stats.gid === process.getgid()) ||
+        ((stats.mode & 64) > 0 && stats.uid === process.getuid()));
+}
+//# sourceMappingURL=io-util.js.map
+
+/***/ }),
+
+/***/ 87:
+/***/ (function(module) {
+
+module.exports = require("os");
+
+/***/ }),
+
+/***/ 99:
+/***/ (function(module) {
+
+
+module.exports = DiffSummary;
+
+/**
+ * The DiffSummary is returned as a response to getting `git().status()`
+ *
+ * @constructor
+ */
+function DiffSummary () {
+   this.files = [];
+   this.insertions = 0;
+   this.deletions = 0;
+   this.changed = 0;
+}
+
+/**
+ * Number of lines added
+ * @type {number}
+ */
+DiffSummary.prototype.insertions = 0;
+
+/**
+ * Number of lines deleted
+ * @type {number}
+ */
+DiffSummary.prototype.deletions = 0;
+
+/**
+ * Number of files changed
+ * @type {number}
+ */
+DiffSummary.prototype.changed = 0;
+
+DiffSummary.parse = function (text) {
+   var line, handler;
+
+   var lines = text.trim().split('\n');
+   var status = new DiffSummary();
+
+   var summary = lines.pop();
+   if (summary) {
+      summary.trim().split(', ').forEach(function (text) {
+         var summary = /(\d+)\s([a-z]+)/.exec(text);
+         if (!summary) {
+            return;
+         }
+
+         if (/files?/.test(summary[2])) {
+            status.changed = parseInt(summary[1], 10);
+         }
+         else {
+            status[summary[2].replace(/s$/, '') + 's'] = parseInt(summary[1], 10);
+         }
+      });
+   }
+
+   while (line = lines.shift()) {
+      textFileChange(line, status.files) || binaryFileChange(line, status.files);
+   }
+
+   return status;
+};
+
+function textFileChange (line, files) {
+   line = line.trim().match(/^(.+)\s+\|\s+(\d+)(\s+[+\-]+)?$/);
+
+   if (line) {
+      var alterations = (line[3] || '').trim();
+      files.push({
+         file: line[1].trim(),
+         changes: parseInt(line[2], 10),
+         insertions: alterations.replace(/-/g, '').length,
+         deletions: alterations.replace(/\+/g, '').length,
+         binary: false
+      });
+
+      return true;
+   }
+}
+
+function binaryFileChange (line, files) {
+   line = line.match(/^(.+) \|\s+Bin ([0-9.]+) -> ([0-9.]+) ([a-z]+)$/);
+   if (line) {
+      files.push({
+         file: line[1].trim(),
+         before: +line[2],
+         after: +line[3],
+         binary: true
+      });
+      return true;
+   }
+}
+
+
+/***/ }),
+
+/***/ 129:
+/***/ (function(module) {
+
+module.exports = require("child_process");
+
+/***/ }),
+
+/***/ 138:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+/**
+ * Exports the utilities `simple-git` depends upon to allow for mocking during a test
+ */
+module.exports = {
+
+   buffer: function () { return __webpack_require__(293).Buffer; },
+
+   childProcess: function () { return __webpack_require__(129); },
+
+   exists: __webpack_require__(146)
+
+};
+
+
+/***/ }),
+
+/***/ 146:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+
+var fs = __webpack_require__(747);
+
+function exists (path, isFile, isDirectory) {
+   try {
+      var matches = false;
+      var stat = fs.statSync(path);
+
+      matches = matches || isFile && stat.isFile();
+      matches = matches || isDirectory && stat.isDirectory();
+
+      return matches;
+   }
+   catch (e) {
+      if (e.code === 'ENOENT') {
+         return false;
+      }
+
+      throw e;
+   }
+}
+
+module.exports = function (path, type) {
+   if (!type) {
+      return exists(path, true, true);
+   }
+
+   return exists(path, type & 1, type & 2);
+};
+
+module.exports.FILE = 1;
+
+module.exports.FOLDER = 2;
+
+
+/***/ }),
+
+/***/ 153:
+/***/ (function(module) {
+
+
+module.exports = CommitSummary;
+
+function CommitSummary () {
+   this.branch = '';
+   this.commit = '';
+   this.summary = {
+      changes: 0,
+      insertions: 0,
+      deletions: 0
+   };
+   this.author = null;
+}
+
+var COMMIT_BRANCH_MESSAGE_REGEX = /\[([^\s]+) ([^\]]+)/;
+var COMMIT_AUTHOR_MESSAGE_REGEX = /\s*Author:\s(.+)/i;
+
+function setBranchFromCommit (commitSummary, commitData) {
+   if (commitData) {
+      commitSummary.branch = commitData[1];
+      commitSummary.commit = commitData[2];
+   }
+}
+
+function setSummaryFromCommit (commitSummary, commitData) {
+   if (commitSummary.branch && commitData) {
+      commitSummary.summary.changes = commitData[1] || 0;
+      commitSummary.summary.insertions = commitData[2] || 0;
+      commitSummary.summary.deletions = commitData[3] || 0;
+   }
+}
+
+function setAuthorFromCommit (commitSummary, commitData) {
+   var parts = commitData[1].split('<');
+   var email = parts.pop();
+
+   if (email.indexOf('@') <= 0) {
+      return;
+   }
+
+   commitSummary.author = {
+      email: email.substr(0, email.length - 1),
+      name: parts.join('<').trim()
+   };
+}
+
+CommitSummary.parse = function (commit) {
+   var lines = commit.trim().split('\n');
+   var commitSummary = new CommitSummary();
+
+   setBranchFromCommit(commitSummary, COMMIT_BRANCH_MESSAGE_REGEX.exec(lines.shift()));
+
+   if (COMMIT_AUTHOR_MESSAGE_REGEX.test(lines[0])) {
+      setAuthorFromCommit(commitSummary, COMMIT_AUTHOR_MESSAGE_REGEX.exec(lines.shift()));
+   }
+
+   setSummaryFromCommit(commitSummary, /(\d+)[^,]*(?:,\s*(\d+)[^,]*)?(?:,\s*(\d+))?/g.exec(lines.shift()));
+
+   return commitSummary;
+};
+
+
+/***/ }),
+
+/***/ 179:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const command_1 = __webpack_require__(960);
+const file_command_1 = __webpack_require__(668);
+const utils_1 = __webpack_require__(956);
+const os = __importStar(__webpack_require__(87));
+const path = __importStar(__webpack_require__(622));
+/**
+ * The code to exit an action
+ */
+var ExitCode;
+(function (ExitCode) {
+    /**
+     * A code indicating that the action was successful
+     */
+    ExitCode[ExitCode["Success"] = 0] = "Success";
+    /**
+     * A code indicating that the action was a failure
+     */
+    ExitCode[ExitCode["Failure"] = 1] = "Failure";
+})(ExitCode = exports.ExitCode || (exports.ExitCode = {}));
+//-----------------------------------------------------------------------
+// Variables
+//-----------------------------------------------------------------------
+/**
+ * Sets env variable for this action and future actions in the job
+ * @param name the name of the variable to set
+ * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function exportVariable(name, val) {
+    const convertedVal = utils_1.toCommandValue(val);
+    process.env[name] = convertedVal;
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        const delimiter = '_GitHubActionsFileCommandDelimeter_';
+        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
+        file_command_1.issueCommand('ENV', commandValue);
+    }
+    else {
+        command_1.issueCommand('set-env', { name }, convertedVal);
+    }
+}
+exports.exportVariable = exportVariable;
+/**
+ * Registers a secret which will get masked from logs
+ * @param secret value of the secret
+ */
+function setSecret(secret) {
+    command_1.issueCommand('add-mask', {}, secret);
+}
+exports.setSecret = setSecret;
+/**
+ * Prepends inputPath to the PATH (for this action and future actions)
+ * @param inputPath
+ */
+function addPath(inputPath) {
+    const filePath = process.env['GITHUB_PATH'] || '';
+    if (filePath) {
+        file_command_1.issueCommand('PATH', inputPath);
+    }
+    else {
+        command_1.issueCommand('add-path', {}, inputPath);
+    }
+    process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
+}
+exports.addPath = addPath;
+/**
+ * Gets the value of an input.  The value is also trimmed.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string
+ */
+function getInput(name, options) {
+    const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+    if (options && options.required && !val) {
+        throw new Error(`Input required and not supplied: ${name}`);
+    }
+    return val.trim();
+}
+exports.getInput = getInput;
+/**
+ * Sets the value of an output.
+ *
+ * @param     name     name of the output to set
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function setOutput(name, value) {
+    command_1.issueCommand('set-output', { name }, value);
+}
+exports.setOutput = setOutput;
+/**
+ * Enables or disables the echoing of commands into stdout for the rest of the step.
+ * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
+ *
+ */
+function setCommandEcho(enabled) {
+    command_1.issue('echo', enabled ? 'on' : 'off');
+}
+exports.setCommandEcho = setCommandEcho;
+//-----------------------------------------------------------------------
+// Results
+//-----------------------------------------------------------------------
+/**
+ * Sets the action status to failed.
+ * When the action exits it will be with an exit code of 1
+ * @param message add error issue message
+ */
+function setFailed(message) {
+    process.exitCode = ExitCode.Failure;
+    error(message);
+}
+exports.setFailed = setFailed;
+//-----------------------------------------------------------------------
+// Logging Commands
+//-----------------------------------------------------------------------
+/**
+ * Gets whether Actions Step Debug is on or not
+ */
+function isDebug() {
+    return process.env['RUNNER_DEBUG'] === '1';
+}
+exports.isDebug = isDebug;
+/**
+ * Writes debug message to user log
+ * @param message debug message
+ */
+function debug(message) {
+    command_1.issueCommand('debug', {}, message);
+}
+exports.debug = debug;
+/**
+ * Adds an error issue
+ * @param message error issue message. Errors will be converted to string via toString()
+ */
+function error(message) {
+    command_1.issue('error', message instanceof Error ? message.toString() : message);
+}
+exports.error = error;
+/**
+ * Adds an warning issue
+ * @param message warning issue message. Errors will be converted to string via toString()
+ */
+function warning(message) {
+    command_1.issue('warning', message instanceof Error ? message.toString() : message);
+}
+exports.warning = warning;
+/**
+ * Writes info to log with console.log.
+ * @param message info message
+ */
+function info(message) {
+    process.stdout.write(message + os.EOL);
+}
+exports.info = info;
+/**
+ * Begin an output group.
+ *
+ * Output until the next `groupEnd` will be foldable in this group
+ *
+ * @param name The name of the output group
+ */
+function startGroup(name) {
+    command_1.issue('group', name);
+}
+exports.startGroup = startGroup;
+/**
+ * End an output group.
+ */
+function endGroup() {
+    command_1.issue('endgroup');
+}
+exports.endGroup = endGroup;
+/**
+ * Wrap an asynchronous function call in a group.
+ *
+ * Returns the same type as the function itself.
+ *
+ * @param name The name of the group
+ * @param fn The function to wrap in the group
+ */
+function group(name, fn) {
+    return __awaiter(this, void 0, void 0, function* () {
+        startGroup(name);
+        let result;
+        try {
+            result = yield fn();
+        }
+        finally {
+            endGroup();
+        }
+        return result;
+    });
+}
+exports.group = group;
+//-----------------------------------------------------------------------
+// Wrapper action state
+//-----------------------------------------------------------------------
+/**
+ * Saves state for current action, the state can only be retrieved by this action's post job execution.
+ *
+ * @param     name     name of the state to store
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function saveState(name, value) {
+    command_1.issueCommand('save-state', { name }, value);
+}
+exports.saveState = saveState;
+/**
+ * Gets the value of an state set by this action's main execution.
+ *
+ * @param     name     name of the state to get
+ * @returns   string
+ */
+function getState(name) {
+    return process.env[`STATE_${name}`] || '';
+}
+exports.getState = getState;
+//# sourceMappingURL=core.js.map
+
+/***/ }),
+
+/***/ 244:
+/***/ (function(module) {
+
+
+module.exports = PullSummary;
+
+/**
+ * The PullSummary is returned as a response to getting `git().pull()`
+ *
+ * @constructor
+ */
+function PullSummary () {
+   this.files = [];
+   this.insertions = {};
+   this.deletions = {};
+
+   this.summary = {
+      changes: 0,
+      insertions: 0,
+      deletions: 0
+   };
+
+   this.created = [];
+   this.deleted = [];
+}
+
+/**
+ * Array of files that were created
+ * @type {string[]}
+ */
+PullSummary.prototype.created = null;
+
+/**
+ * Array of files that were deleted
+ * @type {string[]}
+ */
+PullSummary.prototype.deleted = null;
+
+/**
+ * The array of file paths/names that have been modified in any part of the pulled content
+ * @type {string[]}
+ */
+PullSummary.prototype.files = null;
+
+/**
+ * A map of file path to number to show the number of insertions per file.
+ * @type {Object}
+ */
+PullSummary.prototype.insertions = null;
+
+/**
+ * A map of file path to number to show the number of deletions per file.
+ * @type {Object}
+ */
+PullSummary.prototype.deletions = null;
+
+/**
+ * Overall summary of changes/insertions/deletions and the number associated with each
+ * across all content that was pulled.
+ * @type {Object}
+ */
+PullSummary.prototype.summary = null;
+
+PullSummary.FILE_UPDATE_REGEX = /^\s*(.+?)\s+\|\s+\d+\s*(\+*)(-*)/;
+PullSummary.SUMMARY_REGEX = /(\d+)\D+((\d+)\D+\(\+\))?(\D+(\d+)\D+\(-\))?/;
+PullSummary.ACTION_REGEX = /(create|delete) mode \d+ (.+)/;
+
+PullSummary.parse = function (text) {
+   var pullSummary = new PullSummary;
+   var lines = text.split('\n');
+
+   while (lines.length) {
+      var line = lines.shift().trim();
+      if (!line) {
+         continue;
+      }
+
+      update(pullSummary, line) || summary(pullSummary, line) || action(pullSummary, line);
+   }
+
+   return pullSummary;
+};
+
+function update (pullSummary, line) {
+
+   var update = PullSummary.FILE_UPDATE_REGEX.exec(line);
+   if (!update) {
+      return false;
+   }
+
+   pullSummary.files.push(update[1]);
+
+   var insertions = update[2].length;
+   if (insertions) {
+      pullSummary.insertions[update[1]] = insertions;
+   }
+
+   var deletions = update[3].length;
+   if (deletions) {
+      pullSummary.deletions[update[1]] = deletions;
+   }
+
+   return true;
+}
+
+function summary (pullSummary, line) {
+   if (!pullSummary.files.length) {
+      return false;
+   }
+
+   var update = PullSummary.SUMMARY_REGEX.exec(line);
+   if (!update || (update[3] === undefined && update[5] === undefined)) {
+      return false;
+   }
+
+   pullSummary.summary.changes = +update[1] || 0;
+   pullSummary.summary.insertions = +update[3] || 0;
+   pullSummary.summary.deletions = +update[5] || 0;
+
+   return true;
+}
+
+function action (pullSummary, line) {
+
+   var match = PullSummary.ACTION_REGEX.exec(line);
+   if (!match) {
+      return false;
+   }
+
+   var file = match[2];
+
+   if (pullSummary.files.indexOf(file) < 0) {
+      pullSummary.files.push(file);
+   }
+
+   var container = (match[1] === 'create') ? pullSummary.created : pullSummary.deleted;
+   container.push(file);
+
+   return true;
+}
+
+
+/***/ }),
+
+/***/ 275:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+
+
+
+var FileStatusSummary = __webpack_require__(492);
+
+module.exports = StatusSummary;
+
+/**
+ * The StatusSummary is returned as a response to getting `git().status()`
+ *
+ * @constructor
+ */
+function StatusSummary () {
+   this.not_added = [];
+   this.conflicted = [];
+   this.created = [];
+   this.deleted = [];
+   this.modified = [];
+   this.renamed = [];
+   this.files = [];
+   this.staged = [];
+}
+
+
+/**
+ * Number of commits ahead of the tracked branch
+ * @type {number}
+ */
+StatusSummary.prototype.ahead = 0;
+
+/**
+ * Number of commits behind the tracked branch
+ * @type {number}
+ */
+StatusSummary.prototype.behind = 0;
+
+/**
+ * Name of the current branch
+ * @type {null}
+ */
+StatusSummary.prototype.current = null;
+
+/**
+ * Name of the branch being tracked
+ * @type {string}
+ */
+StatusSummary.prototype.tracking = null;
+
+/**
+ * All files represented as an array of objects containing the `path` and status in `index` and
+ * in the `working_dir`.
+ *
+ * @type {Array}
+ */
+StatusSummary.prototype.files = null;
+
+/**
+ * Gets whether this StatusSummary represents a clean working branch.
+ *
+ * @return {boolean}
+ */
+StatusSummary.prototype.isClean = function () {
+   return 0 === Object.keys(this).filter(function (name) {
+      return Array.isArray(this[name]) && this[name].length;
+   }, this).length;
+};
+
+StatusSummary.parsers = {
+   '##': function (line, status) {
+      var aheadReg = /ahead (\d+)/;
+      var behindReg = /behind (\d+)/;
+      var currentReg = /^(.+?(?=(?:\.{3}|\s|$)))/;
+      var trackingReg = /\.{3}(\S*)/;
+      var regexResult;
+
+      regexResult = aheadReg.exec(line);
+      status.ahead = regexResult && +regexResult[1] || 0;
+
+      regexResult = behindReg.exec(line);
+      status.behind = regexResult && +regexResult[1] || 0;
+
+      regexResult = currentReg.exec(line);
+      status.current = regexResult && regexResult[1];
+
+      regexResult = trackingReg.exec(line);
+      status.tracking = regexResult && regexResult[1];
+   },
+
+   '??': function (line, status) {
+      status.not_added.push(line);
+   },
+
+   A: function (line, status) {
+      status.created.push(line);
+   },
+
+   AM: function (line, status) {
+      status.created.push(line);
+   },
+
+   D: function (line, status) {
+      status.deleted.push(line);
+   },
+
+   M: function (line, status, indexState) {
+      status.modified.push(line);
+
+      if (indexState === 'M') {
+         status.staged.push(line);
+      }
+   },
+
+   R: function (line, status) {
+      var detail = /^(.+) -> (.+)$/.exec(line) || [null, line, line];
+
+      status.renamed.push({
+         from: detail[1],
+         to: detail[2]
+      });
+   },
+
+   UU: function (line, status) {
+      status.conflicted.push(line);
+   }
+};
+
+StatusSummary.parsers.MM = StatusSummary.parsers.M;
+
+/* Map all unmerged status code combinations to UU to mark as conflicted */
+StatusSummary.parsers.AA = StatusSummary.parsers.UU;
+StatusSummary.parsers.UD = StatusSummary.parsers.UU;
+StatusSummary.parsers.DU = StatusSummary.parsers.UU;
+StatusSummary.parsers.DD = StatusSummary.parsers.UU;
+StatusSummary.parsers.AU = StatusSummary.parsers.UU;
+StatusSummary.parsers.UA = StatusSummary.parsers.UU;
+
+StatusSummary.parse = function (text) {
+   var file;
+   var lines = text.trim().split('\n');
+   var status = new StatusSummary();
+
+   for (var i = 0, l = lines.length; i < l; i++) {
+      file = splitLine(lines[i]);
+
+      if (!file) {
+         continue;
+      }
+
+      if (file.handler) {
+         file.handler(file.path, status, file.index, file.workingDir);
+      }
+
+      if (file.code !== '##') {
+         status.files.push(new FileStatusSummary(file.path, file.index, file.workingDir));
+      }
+   }
+
+   return status;
+};
+
+
+function splitLine (lineStr) {
+   var line = lineStr.trim().match(/(..?)(\s+)(.*)/);
+   if (!line || !line[1].trim()) {
+      line = lineStr.trim().match(/(..?)\s+(.*)/);
+   }
+
+   if (!line) {
+      return;
+   }
+
+   var code = line[1];
+   if (line[2].length > 1) {
+      code += ' ';
+   }
+   if (code.length === 1 && line[2].length === 1) {
+      code = ' ' + code;
+   }
+
+   return {
+      raw: code,
+      code: code.trim(),
+      index: code.charAt(0),
+      workingDir: code.charAt(1),
+      handler: StatusSummary.parsers[code.trim()],
+      path: line[3]
+   };
+}
+
+
+/***/ }),
+
+/***/ 293:
+/***/ (function(module) {
+
+module.exports = require("buffer");
+
+/***/ }),
+
+/***/ 305:
+/***/ (function(module) {
+
+
+module.exports = BranchDeletion;
+
+function BranchDeletion (branch, hash) {
+   this.branch = branch;
+   this.hash = hash;
+   this.success = hash !== null;
+}
+
+BranchDeletion.deleteSuccessRegex = /(\S+)\s+\(\S+\s([^\)]+)\)/;
+BranchDeletion.deleteErrorRegex = /^error[^']+'([^']+)'/;
+
+BranchDeletion.parse = function (data, asArray) {
+   var result;
+   var branchDeletions = data.trim().split('\n').map(function (line) {
+         if (result = BranchDeletion.deleteSuccessRegex.exec(line)) {
+            return new BranchDeletion(result[1], result[2]);
+         }
+         else if (result = BranchDeletion.deleteErrorRegex.exec(line)) {
+            return new BranchDeletion(result[1], null);
+         }
+      })
+      .filter(Boolean);
+
+   return asArray ? branchDeletions : branchDeletions.pop();
+};
+
+
+/***/ }),
+
+/***/ 311:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const childProcess = __webpack_require__(129);
+const path = __webpack_require__(622);
+const util_1 = __webpack_require__(669);
+const ioUtil = __webpack_require__(47);
+const exec = util_1.promisify(childProcess.exec);
+/**
+ * Copies a file or folder.
+ * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
+ *
+ * @param     source    source path
+ * @param     dest      destination path
+ * @param     options   optional. See CopyOptions.
+ */
+function cp(source, dest, options = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { force, recursive } = readCopyOptions(options);
+        const destStat = (yield ioUtil.exists(dest)) ? yield ioUtil.stat(dest) : null;
+        // Dest is an existing file, but not forcing
+        if (destStat && destStat.isFile() && !force) {
+            return;
+        }
+        // If dest is an existing directory, should copy inside.
+        const newDest = destStat && destStat.isDirectory()
+            ? path.join(dest, path.basename(source))
+            : dest;
+        if (!(yield ioUtil.exists(source))) {
+            throw new Error(`no such file or directory: ${source}`);
+        }
+        const sourceStat = yield ioUtil.stat(source);
+        if (sourceStat.isDirectory()) {
+            if (!recursive) {
+                throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
+            }
+            else {
+                yield cpDirRecursive(source, newDest, 0, force);
+            }
+        }
+        else {
+            if (path.relative(source, newDest) === '') {
+                // a file cannot be copied to itself
+                throw new Error(`'${newDest}' and '${source}' are the same file`);
+            }
+            yield copyFile(source, newDest, force);
+        }
+    });
+}
+exports.cp = cp;
+/**
+ * Moves a path.
+ *
+ * @param     source    source path
+ * @param     dest      destination path
+ * @param     options   optional. See MoveOptions.
+ */
+function mv(source, dest, options = {}) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (yield ioUtil.exists(dest)) {
+            let destExists = true;
+            if (yield ioUtil.isDirectory(dest)) {
+                // If dest is directory copy src into dest
+                dest = path.join(dest, path.basename(source));
+                destExists = yield ioUtil.exists(dest);
+            }
+            if (destExists) {
+                if (options.force == null || options.force) {
+                    yield rmRF(dest);
+                }
+                else {
+                    throw new Error('Destination already exists');
+                }
+            }
+        }
+        yield mkdirP(path.dirname(dest));
+        yield ioUtil.rename(source, dest);
+    });
+}
+exports.mv = mv;
+/**
+ * Remove a path recursively with force
+ *
+ * @param inputPath path to remove
+ */
+function rmRF(inputPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (ioUtil.IS_WINDOWS) {
+            // Node doesn't provide a delete operation, only an unlink function. This means that if the file is being used by another
+            // program (e.g. antivirus), it won't be deleted. To address this, we shell out the work to rd/del.
+            try {
+                if (yield ioUtil.isDirectory(inputPath, true)) {
+                    yield exec(`rd /s /q "${inputPath}"`);
+                }
+                else {
+                    yield exec(`del /f /a "${inputPath}"`);
+                }
+            }
+            catch (err) {
+                // if you try to delete a file that doesn't exist, desired result is achieved
+                // other errors are valid
+                if (err.code !== 'ENOENT')
+                    throw err;
+            }
+            // Shelling out fails to remove a symlink folder with missing source, this unlink catches that
+            try {
+                yield ioUtil.unlink(inputPath);
+            }
+            catch (err) {
+                // if you try to delete a file that doesn't exist, desired result is achieved
+                // other errors are valid
+                if (err.code !== 'ENOENT')
+                    throw err;
+            }
+        }
+        else {
+            let isDir = false;
+            try {
+                isDir = yield ioUtil.isDirectory(inputPath);
+            }
+            catch (err) {
+                // if you try to delete a file that doesn't exist, desired result is achieved
+                // other errors are valid
+                if (err.code !== 'ENOENT')
+                    throw err;
+                return;
+            }
+            if (isDir) {
+                yield exec(`rm -rf "${inputPath}"`);
+            }
+            else {
+                yield ioUtil.unlink(inputPath);
+            }
+        }
+    });
+}
+exports.rmRF = rmRF;
+/**
+ * Make a directory.  Creates the full path with folders in between
+ * Will throw if it fails
+ *
+ * @param   fsPath        path to create
+ * @returns Promise<void>
+ */
+function mkdirP(fsPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield ioUtil.mkdirP(fsPath);
+    });
+}
+exports.mkdirP = mkdirP;
+/**
+ * Returns path of a tool had the tool actually been invoked.  Resolves via paths.
+ * If you check and the tool does not exist, it will throw.
+ *
+ * @param     tool              name of the tool
+ * @param     check             whether to check if tool exists
+ * @returns   Promise<string>   path to tool
+ */
+function which(tool, check) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!tool) {
+            throw new Error("parameter 'tool' is required");
+        }
+        // recursive when check=true
+        if (check) {
+            const result = yield which(tool, false);
+            if (!result) {
+                if (ioUtil.IS_WINDOWS) {
+                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
+                }
+                else {
+                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
+                }
+            }
+        }
+        try {
+            // build the list of extensions to try
+            const extensions = [];
+            if (ioUtil.IS_WINDOWS && process.env.PATHEXT) {
+                for (const extension of process.env.PATHEXT.split(path.delimiter)) {
+                    if (extension) {
+                        extensions.push(extension);
+                    }
+                }
+            }
+            // if it's rooted, return it if exists. otherwise return empty.
+            if (ioUtil.isRooted(tool)) {
+                const filePath = yield ioUtil.tryGetExecutablePath(tool, extensions);
+                if (filePath) {
+                    return filePath;
+                }
+                return '';
+            }
+            // if any path separators, return empty
+            if (tool.includes('/') || (ioUtil.IS_WINDOWS && tool.includes('\\'))) {
+                return '';
+            }
+            // build the list of directories
+            //
+            // Note, technically "where" checks the current directory on Windows. From a toolkit perspective,
+            // it feels like we should not do this. Checking the current directory seems like more of a use
+            // case of a shell, and the which() function exposed by the toolkit should strive for consistency
+            // across platforms.
+            const directories = [];
+            if (process.env.PATH) {
+                for (const p of process.env.PATH.split(path.delimiter)) {
+                    if (p) {
+                        directories.push(p);
+                    }
+                }
+            }
+            // return the first match
+            for (const directory of directories) {
+                const filePath = yield ioUtil.tryGetExecutablePath(directory + path.sep + tool, extensions);
+                if (filePath) {
+                    return filePath;
+                }
+            }
+            return '';
+        }
+        catch (err) {
+            throw new Error(`which failed with message ${err.message}`);
+        }
+    });
+}
+exports.which = which;
+function readCopyOptions(options) {
+    const force = options.force == null ? true : options.force;
+    const recursive = Boolean(options.recursive);
+    return { force, recursive };
+}
+function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // Ensure there is not a run away recursive copy
+        if (currentDepth >= 255)
+            return;
+        currentDepth++;
+        yield mkdirP(destDir);
+        const files = yield ioUtil.readdir(sourceDir);
+        for (const fileName of files) {
+            const srcFile = `${sourceDir}/${fileName}`;
+            const destFile = `${destDir}/${fileName}`;
+            const srcFileStat = yield ioUtil.lstat(srcFile);
+            if (srcFileStat.isDirectory()) {
+                // Recurse
+                yield cpDirRecursive(srcFile, destFile, currentDepth, force);
+            }
+            else {
+                yield copyFile(srcFile, destFile, force);
+            }
+        }
+        // Change the mode for the newly created directory
+        yield ioUtil.chmod(destDir, (yield ioUtil.stat(sourceDir)).mode);
+    });
+}
+// Buffered file copy
+function copyFile(srcFile, destFile, force) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if ((yield ioUtil.lstat(srcFile)).isSymbolicLink()) {
+            // unlink/re-link it
+            try {
+                yield ioUtil.lstat(destFile);
+                yield ioUtil.unlink(destFile);
+            }
+            catch (e) {
+                // Try to override file permission
+                if (e.code === 'EPERM') {
+                    yield ioUtil.chmod(destFile, '0666');
+                    yield ioUtil.unlink(destFile);
+                }
+                // other errors = it doesn't exist, no work to do
+            }
+            // Copy over symlink
+            const symlinkFull = yield ioUtil.readlink(srcFile);
+            yield ioUtil.symlink(symlinkFull, destFile, ioUtil.IS_WINDOWS ? 'junction' : null);
+        }
+        else if (!(yield ioUtil.exists(destFile)) || force) {
+            yield ioUtil.copyFile(srcFile, destFile);
+        }
+    });
+}
+//# sourceMappingURL=io.js.map
+
+/***/ }),
+
+/***/ 317:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+
+module.exports = ListLogSummary;
+
+var DiffSummary = __webpack_require__(99);
+
+/**
+ * The ListLogSummary is returned as a response to getting `git().log()` or `git().stashList()`
+ *
+ * @constructor
+ */
+function ListLogSummary (all) {
+   this.all = all;
+   this.latest = all.length && all[0] || null;
+   this.total = all.length;
+}
+
+/**
+ * Detail for each of the log lines
+ * @type {ListLogLine[]}
+ */
+ListLogSummary.prototype.all = null;
+
+/**
+ * Most recent entry in the log
+ * @type {ListLogLine}
+ */
+ListLogSummary.prototype.latest = null;
+
+/**
+ * Number of items in the log
+ * @type {number}
+ */
+ListLogSummary.prototype.total = 0;
+
+function ListLogLine (line, fields) {
+   for (var k = 0; k < fields.length; k++) {
+      this[fields[k]] = line[k] || '';
+   }
+}
+
+/**
+ * When the log was generated with a summary, the `diff` property contains as much detail
+ * as was provided in the log (whether generated with `--stat` or `--shortstat`.
+ * @type {DiffSummary}
+ */
+ListLogLine.prototype.diff = null;
+
+ListLogSummary.START_BOUNDARY = 'òòòòòò ';
+
+ListLogSummary.COMMIT_BOUNDARY = ' òò';
+
+ListLogSummary.SPLITTER = ' ò ';
+
+ListLogSummary.parse = function (text, splitter, fields) {
+   fields = fields || ['hash', 'date', 'message', 'refs', 'author_name', 'author_email'];
+   return new ListLogSummary(
+      text
+         .trim()
+         .split(ListLogSummary.START_BOUNDARY)
+         .filter(function(item) { return !!item.trim(); })
+         .map(function (item) {
+            var lineDetail = item.trim().split(ListLogSummary.COMMIT_BOUNDARY);
+            var listLogLine = new ListLogLine(lineDetail[0].trim().split(splitter), fields);
+
+            if (lineDetail.length > 1 && !!lineDetail[1].trim()) {
+               listLogLine.diff = DiffSummary.parse(lineDetail[1]);
+            }
+
+            return listLogLine;
+         })
+   );
+};
+
+
+/***/ }),
+
+/***/ 357:
+/***/ (function(module) {
+
+module.exports = require("assert");
+
+/***/ }),
+
+/***/ 492:
+/***/ (function(module) {
+
+"use strict";
+
+
+function FileStatusSummary (path, index, working_dir) {
+   this.path = path;
+   this.index = index;
+   this.working_dir = working_dir;
+
+   if ('R' === index + working_dir) {
+      var detail = FileStatusSummary.fromPathRegex.exec(path) || [null, path, path];
+      this.from = detail[1];
+      this.path = detail[2];
+   }
+}
+
+FileStatusSummary.fromPathRegex = /^(.+) -> (.+)$/;
+
+FileStatusSummary.prototype = {
+   path: '',
+   from: ''
+};
+
+module.exports = FileStatusSummary;
+
+
+/***/ }),
+
+/***/ 518:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
@@ -2442,8 +1836,8 @@ const os = __importStar(__webpack_require__(87));
 const events = __importStar(__webpack_require__(614));
 const child = __importStar(__webpack_require__(129));
 const path = __importStar(__webpack_require__(622));
-const io = __importStar(__webpack_require__(647));
-const ioUtil = __importStar(__webpack_require__(36));
+const io = __importStar(__webpack_require__(311));
+const ioUtil = __importStar(__webpack_require__(47));
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
 /*
@@ -3023,6 +2417,149 @@ class ExecState extends events.EventEmitter {
 
 /***/ }),
 
+/***/ 535:
+/***/ (function(module) {
+
+
+module.exports = MoveSummary;
+
+/**
+ * The MoveSummary is returned as a response to getting `git().status()`
+ *
+ * @constructor
+ */
+function MoveSummary () {
+   this.moves = [];
+   this.sources = {};
+}
+
+MoveSummary.SUMMARY_REGEX = /^Renaming (.+) to (.+)$/;
+
+MoveSummary.parse = function (text) {
+   var lines = text.split('\n');
+   var summary = new MoveSummary();
+
+   for (var i = 0, iMax = lines.length, line; i < iMax; i++) {
+      line = MoveSummary.SUMMARY_REGEX.exec(lines[i].trim());
+
+      if (line) {
+         summary.moves.push({
+            from: line[1],
+            to: line[2]
+         });
+      }
+   }
+
+   return summary;
+};
+
+
+/***/ }),
+
+/***/ 568:
+/***/ (function(module) {
+
+
+module.exports = function deferred () {
+   var d = {};
+   d.promise = new Promise(function (resolve, reject) {
+      d.resolve = resolve;
+      d.reject = reject
+   });
+
+   return d;
+};
+
+
+/***/ }),
+
+/***/ 585:
+/***/ (function(module) {
+
+
+module.exports = BranchSummary;
+
+function BranchSummary () {
+   this.detached = false;
+   this.current = '';
+   this.all = [];
+   this.branches = {};
+}
+
+BranchSummary.prototype.push = function (current, detached, name, commit, label) {
+   if (current) {
+      this.detached = detached;
+      this.current = name;
+   }
+   this.all.push(name);
+   this.branches[name] = {
+      current: current,
+      name: name,
+      commit: commit,
+      label: label
+   };
+};
+
+BranchSummary.detachedRegex = /^(\*?\s+)\((?:HEAD )?detached (?:from|at) (\S+)\)\s+([a-z0-9]+)\s(.*)$/;
+BranchSummary.branchRegex = /^(\*?\s+)(\S+)\s+([a-z0-9]+)\s(.*)$/;
+
+BranchSummary.parse = function (commit) {
+   var branchSummary = new BranchSummary();
+
+   commit.split('\n')
+      .forEach(function (line) {
+         var detached = true;
+         var branch = BranchSummary.detachedRegex.exec(line);
+         if (!branch) {
+            detached = false;
+            branch = BranchSummary.branchRegex.exec(line);
+         }
+
+         if (branch) {
+            branchSummary.push(
+               branch[1].charAt(0) === '*',
+               detached,
+               branch[2],
+               branch[3],
+               branch[4]
+            );
+         }
+      });
+
+   return branchSummary;
+};
+
+
+/***/ }),
+
+/***/ 587:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+
+var Git = __webpack_require__(836);
+
+module.exports = function (baseDir) {
+
+   var dependencies = __webpack_require__(138);
+
+   if (baseDir && !dependencies.exists(baseDir, dependencies.exists.FOLDER)) {
+       throw new Error("Cannot use simple-git on a directory that does not exist.");
+    }
+
+    return new Git(baseDir || process.cwd(), dependencies.childProcess(), dependencies.buffer());
+};
+
+
+
+/***/ }),
+
+/***/ 614:
+/***/ (function(module) {
+
+module.exports = require("events");
+
+/***/ }),
+
 /***/ 622:
 /***/ (function(module) {
 
@@ -3030,310 +2567,64 @@ module.exports = require("path");
 
 /***/ }),
 
-/***/ 647:
+/***/ 664:
+/***/ (function(module) {
+
+module.exports = eval("require")("supports-color");
+
+
+/***/ }),
+
+/***/ 668:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+// For internal use, subject to change.
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const childProcess = __webpack_require__(129);
-const path = __webpack_require__(622);
-const util_1 = __webpack_require__(669);
-const ioUtil = __webpack_require__(36);
-const exec = util_1.promisify(childProcess.exec);
-/**
- * Copies a file or folder.
- * Based off of shelljs - https://github.com/shelljs/shelljs/blob/9237f66c52e5daa40458f94f9565e18e8132f5a6/src/cp.js
- *
- * @param     source    source path
- * @param     dest      destination path
- * @param     options   optional. See CopyOptions.
- */
-function cp(source, dest, options = {}) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { force, recursive } = readCopyOptions(options);
-        const destStat = (yield ioUtil.exists(dest)) ? yield ioUtil.stat(dest) : null;
-        // Dest is an existing file, but not forcing
-        if (destStat && destStat.isFile() && !force) {
-            return;
-        }
-        // If dest is an existing directory, should copy inside.
-        const newDest = destStat && destStat.isDirectory()
-            ? path.join(dest, path.basename(source))
-            : dest;
-        if (!(yield ioUtil.exists(source))) {
-            throw new Error(`no such file or directory: ${source}`);
-        }
-        const sourceStat = yield ioUtil.stat(source);
-        if (sourceStat.isDirectory()) {
-            if (!recursive) {
-                throw new Error(`Failed to copy. ${source} is a directory, but tried to copy without recursive flag.`);
-            }
-            else {
-                yield cpDirRecursive(source, newDest, 0, force);
-            }
-        }
-        else {
-            if (path.relative(source, newDest) === '') {
-                // a file cannot be copied to itself
-                throw new Error(`'${newDest}' and '${source}' are the same file`);
-            }
-            yield copyFile(source, newDest, force);
-        }
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const fs = __importStar(__webpack_require__(747));
+const os = __importStar(__webpack_require__(87));
+const utils_1 = __webpack_require__(956);
+function issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) {
+        throw new Error(`Unable to find environment variable for file command ${command}`);
+    }
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`Missing file at path: ${filePath}`);
+    }
+    fs.appendFileSync(filePath, `${utils_1.toCommandValue(message)}${os.EOL}`, {
+        encoding: 'utf8'
     });
 }
-exports.cp = cp;
-/**
- * Moves a path.
- *
- * @param     source    source path
- * @param     dest      destination path
- * @param     options   optional. See MoveOptions.
- */
-function mv(source, dest, options = {}) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (yield ioUtil.exists(dest)) {
-            let destExists = true;
-            if (yield ioUtil.isDirectory(dest)) {
-                // If dest is directory copy src into dest
-                dest = path.join(dest, path.basename(source));
-                destExists = yield ioUtil.exists(dest);
-            }
-            if (destExists) {
-                if (options.force == null || options.force) {
-                    yield rmRF(dest);
-                }
-                else {
-                    throw new Error('Destination already exists');
-                }
-            }
-        }
-        yield mkdirP(path.dirname(dest));
-        yield ioUtil.rename(source, dest);
-    });
-}
-exports.mv = mv;
-/**
- * Remove a path recursively with force
- *
- * @param inputPath path to remove
- */
-function rmRF(inputPath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (ioUtil.IS_WINDOWS) {
-            // Node doesn't provide a delete operation, only an unlink function. This means that if the file is being used by another
-            // program (e.g. antivirus), it won't be deleted. To address this, we shell out the work to rd/del.
-            try {
-                if (yield ioUtil.isDirectory(inputPath, true)) {
-                    yield exec(`rd /s /q "${inputPath}"`);
-                }
-                else {
-                    yield exec(`del /f /a "${inputPath}"`);
-                }
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-            }
-            // Shelling out fails to remove a symlink folder with missing source, this unlink catches that
-            try {
-                yield ioUtil.unlink(inputPath);
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-            }
-        }
-        else {
-            let isDir = false;
-            try {
-                isDir = yield ioUtil.isDirectory(inputPath);
-            }
-            catch (err) {
-                // if you try to delete a file that doesn't exist, desired result is achieved
-                // other errors are valid
-                if (err.code !== 'ENOENT')
-                    throw err;
-                return;
-            }
-            if (isDir) {
-                yield exec(`rm -rf "${inputPath}"`);
-            }
-            else {
-                yield ioUtil.unlink(inputPath);
-            }
-        }
-    });
-}
-exports.rmRF = rmRF;
-/**
- * Make a directory.  Creates the full path with folders in between
- * Will throw if it fails
- *
- * @param   fsPath        path to create
- * @returns Promise<void>
- */
-function mkdirP(fsPath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield ioUtil.mkdirP(fsPath);
-    });
-}
-exports.mkdirP = mkdirP;
-/**
- * Returns path of a tool had the tool actually been invoked.  Resolves via paths.
- * If you check and the tool does not exist, it will throw.
- *
- * @param     tool              name of the tool
- * @param     check             whether to check if tool exists
- * @returns   Promise<string>   path to tool
- */
-function which(tool, check) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!tool) {
-            throw new Error("parameter 'tool' is required");
-        }
-        // recursive when check=true
-        if (check) {
-            const result = yield which(tool, false);
-            if (!result) {
-                if (ioUtil.IS_WINDOWS) {
-                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also verify the file has a valid extension for an executable file.`);
-                }
-                else {
-                    throw new Error(`Unable to locate executable file: ${tool}. Please verify either the file path exists or the file can be found within a directory specified by the PATH environment variable. Also check the file mode to verify the file is executable.`);
-                }
-            }
-        }
-        try {
-            // build the list of extensions to try
-            const extensions = [];
-            if (ioUtil.IS_WINDOWS && process.env.PATHEXT) {
-                for (const extension of process.env.PATHEXT.split(path.delimiter)) {
-                    if (extension) {
-                        extensions.push(extension);
-                    }
-                }
-            }
-            // if it's rooted, return it if exists. otherwise return empty.
-            if (ioUtil.isRooted(tool)) {
-                const filePath = yield ioUtil.tryGetExecutablePath(tool, extensions);
-                if (filePath) {
-                    return filePath;
-                }
-                return '';
-            }
-            // if any path separators, return empty
-            if (tool.includes('/') || (ioUtil.IS_WINDOWS && tool.includes('\\'))) {
-                return '';
-            }
-            // build the list of directories
-            //
-            // Note, technically "where" checks the current directory on Windows. From a toolkit perspective,
-            // it feels like we should not do this. Checking the current directory seems like more of a use
-            // case of a shell, and the which() function exposed by the toolkit should strive for consistency
-            // across platforms.
-            const directories = [];
-            if (process.env.PATH) {
-                for (const p of process.env.PATH.split(path.delimiter)) {
-                    if (p) {
-                        directories.push(p);
-                    }
-                }
-            }
-            // return the first match
-            for (const directory of directories) {
-                const filePath = yield ioUtil.tryGetExecutablePath(directory + path.sep + tool, extensions);
-                if (filePath) {
-                    return filePath;
-                }
-            }
-            return '';
-        }
-        catch (err) {
-            throw new Error(`which failed with message ${err.message}`);
-        }
-    });
-}
-exports.which = which;
-function readCopyOptions(options) {
-    const force = options.force == null ? true : options.force;
-    const recursive = Boolean(options.recursive);
-    return { force, recursive };
-}
-function cpDirRecursive(sourceDir, destDir, currentDepth, force) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Ensure there is not a run away recursive copy
-        if (currentDepth >= 255)
-            return;
-        currentDepth++;
-        yield mkdirP(destDir);
-        const files = yield ioUtil.readdir(sourceDir);
-        for (const fileName of files) {
-            const srcFile = `${sourceDir}/${fileName}`;
-            const destFile = `${destDir}/${fileName}`;
-            const srcFileStat = yield ioUtil.lstat(srcFile);
-            if (srcFileStat.isDirectory()) {
-                // Recurse
-                yield cpDirRecursive(srcFile, destFile, currentDepth, force);
-            }
-            else {
-                yield copyFile(srcFile, destFile, force);
-            }
-        }
-        // Change the mode for the newly created directory
-        yield ioUtil.chmod(destDir, (yield ioUtil.stat(sourceDir)).mode);
-    });
-}
-// Buffered file copy
-function copyFile(srcFile, destFile, force) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if ((yield ioUtil.lstat(srcFile)).isSymbolicLink()) {
-            // unlink/re-link it
-            try {
-                yield ioUtil.lstat(destFile);
-                yield ioUtil.unlink(destFile);
-            }
-            catch (e) {
-                // Try to override file permission
-                if (e.code === 'EPERM') {
-                    yield ioUtil.chmod(destFile, '0666');
-                    yield ioUtil.unlink(destFile);
-                }
-                // other errors = it doesn't exist, no work to do
-            }
-            // Copy over symlink
-            const symlinkFull = yield ioUtil.readlink(srcFile);
-            yield ioUtil.symlink(symlinkFull, destFile, ioUtil.IS_WINDOWS ? 'junction' : null);
-        }
-        else if (!(yield ioUtil.exists(destFile)) || force) {
-            yield ioUtil.copyFile(srcFile, destFile);
-        }
-    });
-}
-//# sourceMappingURL=io.js.map
+exports.issueCommand = issueCommand;
+//# sourceMappingURL=file-command.js.map
 
 /***/ }),
 
-/***/ 662:
+/***/ 669:
+/***/ (function(module) {
+
+module.exports = require("util");
+
+/***/ }),
+
+/***/ 703:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 module.exports = MergeSummary;
 module.exports.MergeConflict = MergeConflict;
 
-var PullSummary = __webpack_require__(186);
+var PullSummary = __webpack_require__(244);
 
 function MergeConflict (reason, file, meta) {
    this.reason = reason;
@@ -3437,42 +2728,917 @@ MergeSummary.parse = function (output) {
 
 /***/ }),
 
-/***/ 667:
+/***/ 716:
+/***/ (function(module) {
+
+"use strict";
+
+
+function FetchSummary (raw) {
+   this.raw = raw;
+
+   this.remote = null;
+   this.branches = [];
+   this.tags = [];
+}
+
+FetchSummary.parsers = [
+   [
+      /From (.+)$/, function (fetchSummary, matches) {
+         fetchSummary.remote = matches[0];
+      }
+   ],
+   [
+      /\* \[new branch\]\s+(\S+)\s*\-> (.+)$/, function (fetchSummary, matches) {
+         fetchSummary.branches.push({
+            name: matches[0],
+            tracking: matches[1]
+         });
+      }
+   ],
+   [
+      /\* \[new tag\]\s+(\S+)\s*\-> (.+)$/, function (fetchSummary, matches) {
+         fetchSummary.tags.push({
+            name: matches[0],
+            tracking: matches[1]
+         });
+      }
+   ]
+];
+
+FetchSummary.parse = function (data) {
+   var fetchSummary = new FetchSummary(data);
+
+   String(data)
+      .trim()
+      .split('\n')
+      .forEach(function (line) {
+         var original = line.trim();
+         FetchSummary.parsers.some(function (parser) {
+            var parsed = parser[0].exec(original);
+            if (parsed) {
+               parser[1](fetchSummary, parsed.slice(1));
+               return true;
+            }
+         });
+      });
+
+   return fetchSummary;
+};
+
+module.exports = FetchSummary;
+
+
+/***/ }),
+
+/***/ 747:
+/***/ (function(module) {
+
+module.exports = require("fs");
+
+/***/ }),
+
+/***/ 758:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-/**
- * Detect Electron renderer / nwjs process, which is node, but we should
- * treat as a browser.
- */
 
-if (typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs) {
-	module.exports = __webpack_require__(607);
-} else {
-	module.exports = __webpack_require__(394);
+if (typeof Promise === 'undefined') {
+   throw new ReferenceError("Promise wrappers must be enabled to use the promise API");
+}
+
+function isAsyncCall (fn) {
+   return /^[^)]+then\s*\)/.test(fn) || /\._run\(/.test(fn);
+}
+
+module.exports = function (baseDir) {
+
+   var Git = __webpack_require__(836);
+   var gitFactory = __webpack_require__(587);
+   var git;
+
+
+   var chain = Promise.resolve();
+
+   try {
+      git = gitFactory(baseDir);
+   }
+   catch (e) {
+      chain = Promise.reject(e);
+   }
+
+   return Object.keys(Git.prototype).reduce(function (promiseApi, fn) {
+      if (/^_|then/.test(fn)) {
+         return promiseApi;
+      }
+
+      if (isAsyncCall(Git.prototype[fn])) {
+         promiseApi[fn] = git ? asyncWrapper(fn, git) : function () {
+            return chain;
+         };
+      }
+
+      else {
+         promiseApi[fn] = git ? syncWrapper(fn, git, promiseApi) : function () {
+            return promiseApi;
+         };
+      }
+
+      return promiseApi;
+
+   }, {});
+
+   function asyncWrapper (fn, git) {
+      return function () {
+         var args = [].slice.call(arguments);
+
+         if (typeof args[args.length] === 'function') {
+            throw new TypeError(
+               "Promise interface requires that handlers are not supplied inline, " +
+               "trailing function not allowed in call to " + fn);
+         }
+
+         return chain.then(function () {
+            return new Promise(function (resolve, reject) {
+               args.push(function (err, result) {
+                  if (err) {
+                     return reject(toError(err));
+                  }
+
+                  resolve(result);
+               });
+
+               git[fn].apply(git, args);
+            });
+         });
+      };
+   }
+
+   function syncWrapper (fn, git, api) {
+      return function () {
+         git[fn].apply(git, arguments);
+
+         return api;
+      };
+   }
+
+};
+
+function toError (error) {
+
+   if (error instanceof Error) {
+      return error;
+   }
+
+   if (typeof error === 'string') {
+      return new Error(error);
+   }
+
+   return Object.create(new Error(error), {
+      git: { value: error },
+   });
 }
 
 
 /***/ }),
 
-/***/ 669:
-/***/ (function(module) {
+/***/ 760:
+/***/ (function(module, __unusedexports, __webpack_require__) {
 
-module.exports = require("util");
+
+module.exports = {
+   BranchDeleteSummary: __webpack_require__(305),
+   BranchSummary: __webpack_require__(585),
+   CommitSummary: __webpack_require__(153),
+   DiffSummary: __webpack_require__(99),
+   FetchSummary: __webpack_require__(716),
+   FileStatusSummary: __webpack_require__(492),
+   ListLogSummary: __webpack_require__(317),
+   MergeSummary: __webpack_require__(703),
+   MoveSummary: __webpack_require__(535),
+   PullSummary: __webpack_require__(244),
+   StatusSummary: __webpack_require__(275),
+   TagList: __webpack_require__(848),
+};
+
 
 /***/ }),
 
-/***/ 683:
+/***/ 775:
+/***/ (function(module) {
+
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var w = d * 7;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} [options]
+ * @throws {Error} throw an error if val is not a non-empty string or a number
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options) {
+  options = options || {};
+  var type = typeof val;
+  if (type === 'string' && val.length > 0) {
+    return parse(val);
+  } else if (type === 'number' && isFinite(val)) {
+    return options.long ? fmtLong(val) : fmtShort(val);
+  }
+  throw new Error(
+    'val is not a non-empty string or a valid number. val=' +
+      JSON.stringify(val)
+  );
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = String(str);
+  if (str.length > 100) {
+    return;
+  }
+  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+    str
+  );
+  if (!match) {
+    return;
+  }
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'weeks':
+    case 'week':
+    case 'w':
+      return n * w;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtShort(ms) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return Math.round(ms / d) + 'd';
+  }
+  if (msAbs >= h) {
+    return Math.round(ms / h) + 'h';
+  }
+  if (msAbs >= m) {
+    return Math.round(ms / m) + 'm';
+  }
+  if (msAbs >= s) {
+    return Math.round(ms / s) + 's';
+  }
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function fmtLong(ms) {
+  var msAbs = Math.abs(ms);
+  if (msAbs >= d) {
+    return plural(ms, msAbs, d, 'day');
+  }
+  if (msAbs >= h) {
+    return plural(ms, msAbs, h, 'hour');
+  }
+  if (msAbs >= m) {
+    return plural(ms, msAbs, m, 'minute');
+  }
+  if (msAbs >= s) {
+    return plural(ms, msAbs, s, 'second');
+  }
+  return ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, msAbs, n, name) {
+  var isPlural = msAbs >= n * 1.5;
+  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
+}
+
+
+/***/ }),
+
+/***/ 778:
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Module dependencies.
+ */
+
+const tty = __webpack_require__(867);
+const util = __webpack_require__(669);
+
+/**
+ * This is the Node.js implementation of `debug()`.
+ */
+
+exports.init = init;
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+
+/**
+ * Colors.
+ */
+
+exports.colors = [6, 2, 3, 4, 5, 1];
+
+try {
+	// Optional dependency (as in, doesn't need to be installed, NOT like optionalDependencies in package.json)
+	// eslint-disable-next-line import/no-extraneous-dependencies
+	const supportsColor = __webpack_require__(664);
+
+	if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
+		exports.colors = [
+			20,
+			21,
+			26,
+			27,
+			32,
+			33,
+			38,
+			39,
+			40,
+			41,
+			42,
+			43,
+			44,
+			45,
+			56,
+			57,
+			62,
+			63,
+			68,
+			69,
+			74,
+			75,
+			76,
+			77,
+			78,
+			79,
+			80,
+			81,
+			92,
+			93,
+			98,
+			99,
+			112,
+			113,
+			128,
+			129,
+			134,
+			135,
+			148,
+			149,
+			160,
+			161,
+			162,
+			163,
+			164,
+			165,
+			166,
+			167,
+			168,
+			169,
+			170,
+			171,
+			172,
+			173,
+			178,
+			179,
+			184,
+			185,
+			196,
+			197,
+			198,
+			199,
+			200,
+			201,
+			202,
+			203,
+			204,
+			205,
+			206,
+			207,
+			208,
+			209,
+			214,
+			215,
+			220,
+			221
+		];
+	}
+} catch (error) {
+	// Swallow - we only care if `supports-color` is available; it doesn't have to be.
+}
+
+/**
+ * Build up the default `inspectOpts` object from the environment variables.
+ *
+ *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
+ */
+
+exports.inspectOpts = Object.keys(process.env).filter(key => {
+	return /^debug_/i.test(key);
+}).reduce((obj, key) => {
+	// Camel-case
+	const prop = key
+		.substring(6)
+		.toLowerCase()
+		.replace(/_([a-z])/g, (_, k) => {
+			return k.toUpperCase();
+		});
+
+	// Coerce string value into JS value
+	let val = process.env[key];
+	if (/^(yes|on|true|enabled)$/i.test(val)) {
+		val = true;
+	} else if (/^(no|off|false|disabled)$/i.test(val)) {
+		val = false;
+	} else if (val === 'null') {
+		val = null;
+	} else {
+		val = Number(val);
+	}
+
+	obj[prop] = val;
+	return obj;
+}, {});
+
+/**
+ * Is stdout a TTY? Colored output is enabled when `true`.
+ */
+
+function useColors() {
+	return 'colors' in exports.inspectOpts ?
+		Boolean(exports.inspectOpts.colors) :
+		tty.isatty(process.stderr.fd);
+}
+
+/**
+ * Adds ANSI color escape codes if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs(args) {
+	const {namespace: name, useColors} = this;
+
+	if (useColors) {
+		const c = this.color;
+		const colorCode = '\u001B[3' + (c < 8 ? c : '8;5;' + c);
+		const prefix = `  ${colorCode};1m${name} \u001B[0m`;
+
+		args[0] = prefix + args[0].split('\n').join('\n' + prefix);
+		args.push(colorCode + 'm+' + module.exports.humanize(this.diff) + '\u001B[0m');
+	} else {
+		args[0] = getDate() + name + ' ' + args[0];
+	}
+}
+
+function getDate() {
+	if (exports.inspectOpts.hideDate) {
+		return '';
+	}
+	return new Date().toISOString() + ' ';
+}
+
+/**
+ * Invokes `util.format()` with the specified arguments and writes to stderr.
+ */
+
+function log(...args) {
+	return process.stderr.write(util.format(...args) + '\n');
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+function save(namespaces) {
+	if (namespaces) {
+		process.env.DEBUG = namespaces;
+	} else {
+		// If you set a process.env field to null or undefined, it gets cast to the
+		// string 'null' or 'undefined'. Just delete instead.
+		delete process.env.DEBUG;
+	}
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+	return process.env.DEBUG;
+}
+
+/**
+ * Init logic for `debug` instances.
+ *
+ * Create a new `inspectOpts` object in case `useColors` is set
+ * differently for a particular `debug` instance.
+ */
+
+function init(debug) {
+	debug.inspectOpts = {};
+
+	const keys = Object.keys(exports.inspectOpts);
+	for (let i = 0; i < keys.length; i++) {
+		debug.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
+	}
+}
+
+module.exports = __webpack_require__(830)(exports);
+
+const {formatters} = module.exports;
+
+/**
+ * Map %o to `util.inspect()`, all on a single line.
+ */
+
+formatters.o = function (v) {
+	this.inspectOpts.colors = this.useColors;
+	return util.inspect(v, this.inspectOpts)
+		.replace(/\s*\n\s*/g, ' ');
+};
+
+/**
+ * Map %O to `util.inspect()`, allowing multiple lines if needed.
+ */
+
+formatters.O = function (v) {
+	this.inspectOpts.colors = this.useColors;
+	return util.inspect(v, this.inspectOpts);
+};
+
+
+/***/ }),
+
+/***/ 830:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ */
+
+function setup(env) {
+	createDebug.debug = createDebug;
+	createDebug.default = createDebug;
+	createDebug.coerce = coerce;
+	createDebug.disable = disable;
+	createDebug.enable = enable;
+	createDebug.enabled = enabled;
+	createDebug.humanize = __webpack_require__(775);
+
+	Object.keys(env).forEach(key => {
+		createDebug[key] = env[key];
+	});
+
+	/**
+	* Active `debug` instances.
+	*/
+	createDebug.instances = [];
+
+	/**
+	* The currently active debug mode names, and names to skip.
+	*/
+
+	createDebug.names = [];
+	createDebug.skips = [];
+
+	/**
+	* Map of special "%n" handling functions, for the debug "format" argument.
+	*
+	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+	*/
+	createDebug.formatters = {};
+
+	/**
+	* Selects a color for a debug namespace
+	* @param {String} namespace The namespace string for the for the debug instance to be colored
+	* @return {Number|String} An ANSI color code for the given namespace
+	* @api private
+	*/
+	function selectColor(namespace) {
+		let hash = 0;
+
+		for (let i = 0; i < namespace.length; i++) {
+			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
+			hash |= 0; // Convert to 32bit integer
+		}
+
+		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+	}
+	createDebug.selectColor = selectColor;
+
+	/**
+	* Create a debugger with the given `namespace`.
+	*
+	* @param {String} namespace
+	* @return {Function}
+	* @api public
+	*/
+	function createDebug(namespace) {
+		let prevTime;
+
+		function debug(...args) {
+			// Disabled?
+			if (!debug.enabled) {
+				return;
+			}
+
+			const self = debug;
+
+			// Set `diff` timestamp
+			const curr = Number(new Date());
+			const ms = curr - (prevTime || curr);
+			self.diff = ms;
+			self.prev = prevTime;
+			self.curr = curr;
+			prevTime = curr;
+
+			args[0] = createDebug.coerce(args[0]);
+
+			if (typeof args[0] !== 'string') {
+				// Anything else let's inspect with %O
+				args.unshift('%O');
+			}
+
+			// Apply any `formatters` transformations
+			let index = 0;
+			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
+				// If we encounter an escaped % then don't increase the array index
+				if (match === '%%') {
+					return match;
+				}
+				index++;
+				const formatter = createDebug.formatters[format];
+				if (typeof formatter === 'function') {
+					const val = args[index];
+					match = formatter.call(self, val);
+
+					// Now we need to remove `args[index]` since it's inlined in the `format`
+					args.splice(index, 1);
+					index--;
+				}
+				return match;
+			});
+
+			// Apply env-specific formatting (colors, etc.)
+			createDebug.formatArgs.call(self, args);
+
+			const logFn = self.log || createDebug.log;
+			logFn.apply(self, args);
+		}
+
+		debug.namespace = namespace;
+		debug.enabled = createDebug.enabled(namespace);
+		debug.useColors = createDebug.useColors();
+		debug.color = createDebug.selectColor(namespace);
+		debug.destroy = destroy;
+		debug.extend = extend;
+
+		// Env-specific initialization logic for debug instances
+		if (typeof createDebug.init === 'function') {
+			createDebug.init(debug);
+		}
+
+		createDebug.instances.push(debug);
+
+		return debug;
+	}
+
+	function destroy() {
+		const index = createDebug.instances.indexOf(this);
+		if (index !== -1) {
+			createDebug.instances.splice(index, 1);
+			return true;
+		}
+		return false;
+	}
+
+	function extend(namespace, delimiter) {
+		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+		newDebug.log = this.log;
+		return newDebug;
+	}
+
+	/**
+	* Enables a debug mode by namespaces. This can include modes
+	* separated by a colon and wildcards.
+	*
+	* @param {String} namespaces
+	* @api public
+	*/
+	function enable(namespaces) {
+		createDebug.save(namespaces);
+
+		createDebug.names = [];
+		createDebug.skips = [];
+
+		let i;
+		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+		const len = split.length;
+
+		for (i = 0; i < len; i++) {
+			if (!split[i]) {
+				// ignore empty strings
+				continue;
+			}
+
+			namespaces = split[i].replace(/\*/g, '.*?');
+
+			if (namespaces[0] === '-') {
+				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+			} else {
+				createDebug.names.push(new RegExp('^' + namespaces + '$'));
+			}
+		}
+
+		for (i = 0; i < createDebug.instances.length; i++) {
+			const instance = createDebug.instances[i];
+			instance.enabled = createDebug.enabled(instance.namespace);
+		}
+	}
+
+	/**
+	* Disable debug output.
+	*
+	* @return {String} namespaces
+	* @api public
+	*/
+	function disable() {
+		const namespaces = [
+			...createDebug.names.map(toNamespace),
+			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
+		].join(',');
+		createDebug.enable('');
+		return namespaces;
+	}
+
+	/**
+	* Returns true if the given mode name is enabled, false otherwise.
+	*
+	* @param {String} name
+	* @return {Boolean}
+	* @api public
+	*/
+	function enabled(name) {
+		if (name[name.length - 1] === '*') {
+			return true;
+		}
+
+		let i;
+		let len;
+
+		for (i = 0, len = createDebug.skips.length; i < len; i++) {
+			if (createDebug.skips[i].test(name)) {
+				return false;
+			}
+		}
+
+		for (i = 0, len = createDebug.names.length; i < len; i++) {
+			if (createDebug.names[i].test(name)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	* Convert regexp to namespace
+	*
+	* @param {RegExp} regxep
+	* @return {String} namespace
+	* @api private
+	*/
+	function toNamespace(regexp) {
+		return regexp.toString()
+			.substring(2, regexp.toString().length - 2)
+			.replace(/\.\*\?$/, '*');
+	}
+
+	/**
+	* Coerce `val`.
+	*
+	* @param {Mixed} val
+	* @return {Mixed}
+	* @api private
+	*/
+	function coerce(val) {
+		if (val instanceof Error) {
+			return val.stack || val.message;
+		}
+		return val;
+	}
+
+	createDebug.enable(createDebug.load());
+
+	return createDebug;
+}
+
+module.exports = setup;
+
+
+/***/ }),
+
+/***/ 836:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 (function () {
 
    'use strict';
 
-   var debug = __webpack_require__(667)('simple-git');
-   var deferred = __webpack_require__(375);
-   var exists = __webpack_require__(759);
+   var debug = __webpack_require__(26)('simple-git');
+   var deferred = __webpack_require__(568);
+   var exists = __webpack_require__(146);
    var NOOP = function () {};
-   var responses = __webpack_require__(20);
+   var responses = __webpack_require__(760);
 
    /**
     * Git handling for node. All public functions can be chained and all `then` handlers are optional.
@@ -5060,432 +5226,214 @@ To use promises switch to importing 'simple-git/promise'.`);
 
 /***/ }),
 
-/***/ 724:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const tr = __importStar(__webpack_require__(620));
-/**
- * Exec a command.
- * Output will be streamed to the live console.
- * Returns promise with return code
- *
- * @param     commandLine        command to execute (can include additional args). Must be correctly escaped.
- * @param     args               optional arguments for tool. Escaping is handled by the lib.
- * @param     options            optional exec options.  See ExecOptions
- * @returns   Promise<number>    exit code
- */
-function exec(commandLine, args, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const commandArgs = tr.argStringToArray(commandLine);
-        if (commandArgs.length === 0) {
-            throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
-        }
-        // Path to tool to execute should be first arg
-        const toolPath = commandArgs[0];
-        args = commandArgs.slice(1).concat(args || []);
-        const runner = new tr.ToolRunner(toolPath, args, options);
-        return runner.exec();
-    });
-}
-exports.exec = exec;
-//# sourceMappingURL=exec.js.map
-
-/***/ }),
-
-/***/ 747:
-/***/ (function(module) {
-
-module.exports = require("fs");
-
-/***/ }),
-
-/***/ 753:
+/***/ 848:
 /***/ (function(module) {
 
 
-module.exports = BranchSummary;
+module.exports = TagList;
 
-function BranchSummary () {
-   this.detached = false;
-   this.current = '';
-   this.all = [];
-   this.branches = {};
+function TagList (tagList, latest) {
+   this.latest = latest;
+   this.all = tagList
 }
 
-BranchSummary.prototype.push = function (current, detached, name, commit, label) {
-   if (current) {
-      this.detached = detached;
-      this.current = name;
-   }
-   this.all.push(name);
-   this.branches[name] = {
-      current: current,
-      name: name,
-      commit: commit,
-      label: label
-   };
-};
-
-BranchSummary.detachedRegex = /^(\*?\s+)\((?:HEAD )?detached (?:from|at) (\S+)\)\s+([a-z0-9]+)\s(.*)$/;
-BranchSummary.branchRegex = /^(\*?\s+)(\S+)\s+([a-z0-9]+)\s(.*)$/;
-
-BranchSummary.parse = function (commit) {
-   var branchSummary = new BranchSummary();
-
-   commit.split('\n')
-      .forEach(function (line) {
-         var detached = true;
-         var branch = BranchSummary.detachedRegex.exec(line);
-         if (!branch) {
-            detached = false;
-            branch = BranchSummary.branchRegex.exec(line);
-         }
-
-         if (branch) {
-            branchSummary.push(
-               branch[1].charAt(0) === '*',
-               detached,
-               branch[2],
-               branch[3],
-               branch[4]
-            );
-         }
-      });
-
-   return branchSummary;
-};
-
-
-/***/ }),
-
-/***/ 759:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-
-var fs = __webpack_require__(747);
-
-function exists (path, isFile, isDirectory) {
-   try {
-      var matches = false;
-      var stat = fs.statSync(path);
-
-      matches = matches || isFile && stat.isFile();
-      matches = matches || isDirectory && stat.isDirectory();
-
-      return matches;
-   }
-   catch (e) {
-      if (e.code === 'ENOENT') {
-         return false;
+TagList.parse = function (data, customSort) {
+   var number = function (input) {
+      if (typeof input === 'string') {
+         return parseInt(input.replace(/^\D+/g, ''), 10) || 0;
       }
 
-      throw e;
-   }
-}
+      return 0;
+   };
 
-module.exports = function (path, type) {
-   if (!type) {
-      return exists(path, true, true);
+   var tags = data
+      .trim()
+      .split('\n')
+      .map(function (item) { return item.trim(); })
+      .filter(Boolean);
+
+   if (!customSort) {
+      tags.sort(function (tagA, tagB) {
+         var partsA = tagA.split('.');
+         var partsB = tagB.split('.');
+
+         if (partsA.length === 1 || partsB.length === 1) {
+            return tagA - tagB > 0 ? 1 : -1;
+         }
+
+         for (var i = 0, l = Math.max(partsA.length, partsB.length); i < l; i++) {
+            var a = number(partsA[i]);
+            var b = number(partsB[i]);
+
+            var diff = a - b;
+            if (diff) {
+               return diff > 0 ? 1 : -1;
+            }
+         }
+
+         return 0;
+      });
    }
 
-   return exists(path, type & 1, type & 2);
+   var latest = customSort ? tags[0] : tags.filter(function (tag) { return tag.indexOf('.') >= 0; }).pop();
+
+   return new TagList(tags, latest);
 };
-
-module.exports.FILE = 1;
-
-module.exports.FOLDER = 2;
 
 
 /***/ }),
 
-/***/ 785:
+/***/ 867:
 /***/ (function(module) {
 
+module.exports = require("tty");
 
-module.exports = DiffSummary;
+/***/ }),
 
-/**
- * The DiffSummary is returned as a response to getting `git().status()`
- *
- * @constructor
- */
-function DiffSummary () {
-   this.files = [];
-   this.insertions = 0;
-   this.deletions = 0;
-   this.changed = 0;
-}
+/***/ 891:
+/***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
-/**
- * Number of lines added
- * @type {number}
- */
-DiffSummary.prototype.insertions = 0;
+const core = __webpack_require__(179);
+const exec = __webpack_require__(968);
+const git = __webpack_require__(758)();
+const fs = __webpack_require__(747);
 
-/**
- * Number of lines deleted
- * @type {number}
- */
-DiffSummary.prototype.deletions = 0;
+(async () => {
+    try {
 
-/**
- * Number of files changed
- * @type {number}
- */
-DiffSummary.prototype.changed = 0;
+        // Fail fast, we can only handle pushes to branches
+        if (!process.env.GITHUB_REF || !process.env.GITHUB_REF.match(/^refs\/heads\//)) {
+            throw new Exception("No branch given via process.env.GITHUB_REF");
+        }
 
-DiffSummary.parse = function (text) {
-   var line, handler;
+        // Define some parameters
+        let name = core.getInput('name');
+        if (name == "") {
+            name = process.env.GITHUB_REPOSITORY;
+        }
+        if (core.getInput('registry') == 'acr') {
+            name = process.env.ACR_LOGIN + '/' + name.substring('leanix/'.length)
+        }
+        if (core.getInput('registry') == 'acr-public') {
+            name = process.env.ACR_PUBLIC_LOGIN + '/' + name.substring('leanix/'.length)
+        }
+        const branch = process.env.GITHUB_REF.replace(/^refs\/heads\//, '');
+        const normalisedBranch = branch.replace(/\W+/g, '-');
+        const versionTagPrefix = 'VERSION-' + normalisedBranch.toUpperCase() + '-';
+        const currentCommit = process.env.GITHUB_SHA;
+        let latestTag = normalisedBranch + "-latest";
+        if (["master", "main"].includes(normalisedBranch)) {
+            latestTag = "latest";
+        }
+        const nameWithLatestTag = name + ":" + latestTag;
+        let currentVersion=0;
+        let taggedCommit;
+        let nextVersion;
+        let path = core.getInput('path');
+        let onlyOutputTags = core.getInput('only-output-tags') == 'true'
+        let dockerfile = core.getInput('dockerfile');
+        let pushTags = core.getInput('push-tags')  == 'true'
 
-   var lines = text.trim().split('\n');
-   var status = new DiffSummary();
+        // Parameters for caching
+        let enableCache = core.getInput('enable-cache') == 'true';
 
-   var summary = lines.pop();
-   if (summary) {
-      summary.trim().split(', ').forEach(function (text) {
-         var summary = /(\d+)\s([a-z]+)/.exec(text);
-         if (!summary) {
-            return;
-         }
 
-         if (/files?/.test(summary[2])) {
-            status.changed = parseInt(summary[1], 10);
-         }
-         else {
-            status[summary[2].replace(/s$/, '') + 's'] = parseInt(summary[1], 10);
-         }
-      });
-   }
+        // Fetch tags and look for existing one matching the current versionTagPrefix
+        await git.fetch(['--tags']);
+        const tagsOfCurrentCommitString = await git.tag(
+            [
+                '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
+                '--points-at', currentCommit, // ...and that point at our current commit...
+                '--sort', '-v:refname' // ...and sort them in reverse in case there is more than one
+            ]
+        );
 
-   while (line = lines.shift()) {
-      textFileChange(line, status.files) || binaryFileChange(line, status.files);
-   }
+        if (tagsOfCurrentCommitString.length > 0) {
+            // If the commit is already tagged, we use that tag
+            const tagsOfCurrentCommit = tagsOfCurrentCommitString.split('\n');
+            currentVersion=parseInt(tagsOfCurrentCommit[0].replace(versionTagPrefix, ''));
+            taggedCommit = currentCommit;
+        } else {
+            // Otherwise we determine the latest version tag such that we can create a new tag with an incremented version number
+            const tagsString = await git.tag(
+                [
+                    '-l', versionTagPrefix + '*', // Only list tags that start with our version prefix...
+                    '--sort', '-v:refname' // ...and sort them in reverse
+                ]
+            );
+            // If we found one, use it to update the current version and set the tagged commit
+            if (tagsString.length > 0) {
+                const tags = tagsString.split('\n');
+                currentVersion=parseInt(tags[0].replace(versionTagPrefix, ''));
+                taggedCommit = await git.show(['--pretty=format:%H', '-s', tags[0]]);
+            }
+        }
 
-   return status;
-};
+        // If we found a tagged commit and it equals the current one, just reuse the version, otherwise tag a new version and push the tag
+        if (taggedCommit == currentCommit) {
+            core.info("Current commit is already tagged with version " + currentVersion);
+            nextVersion = currentVersion;
+        } else {
+            nextVersion = currentVersion + 1;
+            core.info("Next version on branch " + branch + " is " + nextVersion);
+            await git.tag([versionTagPrefix + nextVersion, process.env.GITHUB_REF]);
+            await git.pushTags();
+        }
+        const versionTag = normalisedBranch + "-" + nextVersion
+        const nameWithVersion = name + ":" + versionTag;
 
-function textFileChange (line, files) {
-   line = line.trim().match(/^(.+)\s+\|\s+(\d+)(\s+[+\-]+)?$/);
+        if (!onlyOutputTags) {
+            // Configure docker
+            let auths = {
+                "https://index.docker.io/v1/": {
+                    auth: Buffer.from(process.env.DOCKER_HUB_USERNAME + ':' + process.env.DOCKER_HUB_PASSWORD).toString('base64')
+                }
+            }
+            auths[process.env.ACR_LOGIN] = {
+                auth: Buffer.from(process.env.ACR_USERNAME + ':' + process.env.ACR_PASSWORD).toString('base64')
+            }
+            auths[process.env.ACR_PUBLIC_LOGIN] = {
+                auth: Buffer.from(process.env.ACR_PUBLIC_USERNAME + ':' + process.env.ACR_PUBLIC_PASSWORD).toString('base64')
+            }
 
-   if (line) {
-      var alterations = (line[3] || '').trim();
-      files.push({
-         file: line[1].trim(),
-         changes: parseInt(line[2], 10),
-         insertions: alterations.replace(/-/g, '').length,
-         deletions: alterations.replace(/\+/g, '').length,
-         binary: false
-      });
+            const dockerConfigDirectory = process.env.RUNNER_TEMP + "/docker_config_" + Date.now();
+            fs.mkdirSync(dockerConfigDirectory);
+            fs.writeFileSync(dockerConfigDirectory + "/config.json", JSON.stringify({auths: auths}));
+            core.exportVariable('DOCKER_CONFIG', dockerConfigDirectory);
 
-      return true;
-   }
-}
+            // Now build the docker image tagged with the correct version and push it
+            const options = {stdout: (data) => core.info(data.toString()), stderror: (data) => core.error(data.toString())};
+            core.info("Will now build Dockerfile at " + path + " as " + nameWithVersion);
+            dockerfile_param = ((dockerfile == "")? []: ["-f", dockerfile])
+            if (enableCache) {
+                const nameWithCurrentVersion = name + ":" + normalisedBranch + "-" + currentVersion;
+                const cachingArgs = ["--cache-from", "type=registry,ref=" + nameWithCurrentVersion, "--cache-to", "type=inline"];
+                await exec.exec('docker', ['buildx', 'build', ...cachingArgs, '-t', nameWithVersion, ...dockerfile_param, path], options);
+            }
+            else {
+                await exec.exec('docker', ['build', '-t', nameWithVersion, ...dockerfile_param, path], options);
 
-function binaryFileChange (line, files) {
-   line = line.match(/^(.+) \|\s+Bin ([0-9.]+) -> ([0-9.]+) ([a-z]+)$/);
-   if (line) {
-      files.push({
-         file: line[1].trim(),
-         before: +line[2],
-         after: +line[3],
-         binary: true
-      });
-      return true;
-   }
-}
+            }
+            await exec.exec('docker', ['push', nameWithVersion], options);
+            if (pushTags) {
+                // Also push a "latest" tag
+                await exec.exec('docker', ['tag', nameWithVersion, nameWithLatestTag], options);
+            }
+            await exec.exec('docker', ['push', nameWithLatestTag], options);
+        }
+
+        core.setOutput('tag', versionTag);
+        core.setOutput('latest_tag', latestTag);
+        core.setOutput('git_tag', versionTagPrefix + nextVersion);
+    } catch (e) {
+        core.setFailed(e.message);
+    }
+})();
 
 
 /***/ }),
 
-/***/ 793:
-/***/ (function(module) {
-
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
-
-
-/***/ }),
-
-/***/ 830:
+/***/ 956:
 /***/ (function(__unusedmodule, exports) {
 
 "use strict";
@@ -5511,85 +5459,140 @@ exports.toCommandValue = toCommandValue;
 
 /***/ }),
 
-/***/ 867:
-/***/ (function(module) {
+/***/ 960:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-module.exports = require("tty");
+"use strict";
 
-/***/ }),
-
-/***/ 900:
-/***/ (function(module) {
-
-
-module.exports = CommitSummary;
-
-function CommitSummary () {
-   this.branch = '';
-   this.commit = '';
-   this.summary = {
-      changes: 0,
-      insertions: 0,
-      deletions: 0
-   };
-   this.author = null;
-}
-
-var COMMIT_BRANCH_MESSAGE_REGEX = /\[([^\s]+) ([^\]]+)/;
-var COMMIT_AUTHOR_MESSAGE_REGEX = /\s*Author:\s(.+)/i;
-
-function setBranchFromCommit (commitSummary, commitData) {
-   if (commitData) {
-      commitSummary.branch = commitData[1];
-      commitSummary.commit = commitData[2];
-   }
-}
-
-function setSummaryFromCommit (commitSummary, commitData) {
-   if (commitSummary.branch && commitData) {
-      commitSummary.summary.changes = commitData[1] || 0;
-      commitSummary.summary.insertions = commitData[2] || 0;
-      commitSummary.summary.deletions = commitData[3] || 0;
-   }
-}
-
-function setAuthorFromCommit (commitSummary, commitData) {
-   var parts = commitData[1].split('<');
-   var email = parts.pop();
-
-   if (email.indexOf('@') <= 0) {
-      return;
-   }
-
-   commitSummary.author = {
-      email: email.substr(0, email.length - 1),
-      name: parts.join('<').trim()
-   };
-}
-
-CommitSummary.parse = function (commit) {
-   var lines = commit.trim().split('\n');
-   var commitSummary = new CommitSummary();
-
-   setBranchFromCommit(commitSummary, COMMIT_BRANCH_MESSAGE_REGEX.exec(lines.shift()));
-
-   if (COMMIT_AUTHOR_MESSAGE_REGEX.test(lines[0])) {
-      setAuthorFromCommit(commitSummary, COMMIT_AUTHOR_MESSAGE_REGEX.exec(lines.shift()));
-   }
-
-   setSummaryFromCommit(commitSummary, /(\d+)[^,]*(?:,\s*(\d+)[^,]*)?(?:,\s*(\d+))?/g.exec(lines.shift()));
-
-   return commitSummary;
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
 };
-
+Object.defineProperty(exports, "__esModule", { value: true });
+const os = __importStar(__webpack_require__(87));
+const utils_1 = __webpack_require__(956);
+/**
+ * Commands
+ *
+ * Command Format:
+ *   ::name key=value,key=value::message
+ *
+ * Examples:
+ *   ::warning::This is the message
+ *   ::set-env name=MY_VAR::some value
+ */
+function issueCommand(command, properties, message) {
+    const cmd = new Command(command, properties, message);
+    process.stdout.write(cmd.toString() + os.EOL);
+}
+exports.issueCommand = issueCommand;
+function issue(name, message = '') {
+    issueCommand(name, {}, message);
+}
+exports.issue = issue;
+const CMD_STRING = '::';
+class Command {
+    constructor(command, properties, message) {
+        if (!command) {
+            command = 'missing.command';
+        }
+        this.command = command;
+        this.properties = properties;
+        this.message = message;
+    }
+    toString() {
+        let cmdStr = CMD_STRING + this.command;
+        if (this.properties && Object.keys(this.properties).length > 0) {
+            cmdStr += ' ';
+            let first = true;
+            for (const key in this.properties) {
+                if (this.properties.hasOwnProperty(key)) {
+                    const val = this.properties[key];
+                    if (val) {
+                        if (first) {
+                            first = false;
+                        }
+                        else {
+                            cmdStr += ',';
+                        }
+                        cmdStr += `${key}=${escapeProperty(val)}`;
+                    }
+                }
+            }
+        }
+        cmdStr += `${CMD_STRING}${escapeData(this.message)}`;
+        return cmdStr;
+    }
+}
+function escapeData(s) {
+    return utils_1.toCommandValue(s)
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A');
+}
+function escapeProperty(s) {
+    return utils_1.toCommandValue(s)
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A')
+        .replace(/:/g, '%3A')
+        .replace(/,/g, '%2C');
+}
+//# sourceMappingURL=command.js.map
 
 /***/ }),
 
-/***/ 909:
-/***/ (function(module) {
+/***/ 968:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
-module.exports = eval("require")("supports-color");
+"use strict";
 
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const tr = __importStar(__webpack_require__(518));
+/**
+ * Exec a command.
+ * Output will be streamed to the live console.
+ * Returns promise with return code
+ *
+ * @param     commandLine        command to execute (can include additional args). Must be correctly escaped.
+ * @param     args               optional arguments for tool. Escaping is handled by the lib.
+ * @param     options            optional exec options.  See ExecOptions
+ * @returns   Promise<number>    exit code
+ */
+function exec(commandLine, args, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const commandArgs = tr.argStringToArray(commandLine);
+        if (commandArgs.length === 0) {
+            throw new Error(`Parameter 'commandLine' cannot be null or empty.`);
+        }
+        // Path to tool to execute should be first arg
+        const toolPath = commandArgs[0];
+        args = commandArgs.slice(1).concat(args || []);
+        const runner = new tr.ToolRunner(toolPath, args, options);
+        return runner.exec();
+    });
+}
+exports.exec = exec;
+//# sourceMappingURL=exec.js.map
 
 /***/ })
 

@@ -17,6 +17,9 @@ inputs:
   enable-cache:
     description: 'Enable caching docker layers'
     default: true
+  push-tags:
+    description: 'Push tags to the repository'
+    default: true
 outputs:
   tag:
     description: 'The tag that was build and pushed'
