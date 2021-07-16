@@ -60,6 +60,9 @@ jobs:
         registry: acr
         enable-cache: false
     - name: use-action-no-push-tags
+      id: use-action-no-push-tags
+      uses: ./
+      with:
         path: test/
         registry: acr
         push-tags: false
